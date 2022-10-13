@@ -11,13 +11,13 @@ Unity project focused on building a solid foundation for 2d movement [(video dem
 ## Controls:
 
 **Movement:**<br>
-A/D: Left/Right movement <br>W: Jump
+A/D: Left/Right movement <br>W/Up/Space: Jump
 
 **In air:**<br>
-S: Fast Fall
+S/Down: Fast Fall
 
 **On wall (facing left):**<br>
-W: Wall jump <br>A+W: Wall jump climb<br>D+W: Wall leap off <br> *Opposite controls for facing right*
+W/Up/Space: Wall jump <br>A+W/Up/Space: Wall jump climb<br>D+W/Up/Space: Wall leap off <br> *Opposite controls for facing right*
 
 ## Project Usage:
 
@@ -30,7 +30,7 @@ Here's a quick run down of the important scripts/variables:
  - [PlayerInput](Assets/Scripts/PlayerInput.cs) script handles controls.
  - [PlayerVelocity](Assets/Scripts/PlayerVelocity.cs) script takes input from the [PlayerInput](Assets/Scripts/PlayerInput.cs) and calculates velocities then outputs displacements.
  - [Movement](Assets/Scripts/Movement.cs) takes input displacements (e.g. from [PlayerVelocity](Assets/Scripts/PlayerVelocity.cs)/[PassengerMover](Assets/Scripts/PassengerMover.cs)) then checks for collisions and moves the given object accordingly.
- -  [MovingPlatform](Assets/Scripts/MovingPlatform.cs) moves a platform, you can also assign the platform to be a [PassengerMover](Assets/Scripts/PassengerMover.cs) then it will move any other objects that have been assigned as a [Passenger](Assets/Scripts/Passenger.cs).
+ - [MovingPlatform](Assets/Scripts/MovingPlatform.cs) moves a platform, you can also assign the platform to be a [PassengerMover](Assets/Scripts/PassengerMover.cs) then it will move any other objects that have been assigned as a [Passenger](Assets/Scripts/Passenger.cs).
  - [BoxColliderCasts](Assets/Scripts/BoxColliderCasts.cs) is a base class to set up raycasts and boxcast origins for collision detection.
 
 **Adjustable Variables:**

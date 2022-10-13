@@ -7,83 +7,77 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class BoxColliderCasts : MonoBehaviour
 {
+    [HideInInspector] public BoxCollider2D boxCollider;
+    [HideInInspector] public int horizontalRayCount;
+    [HideInInspector] public int verticalRayCount;
+    [HideInInspector] public float horizontalRaySpacing;
+    [HideInInspector] public float verticalRaySpacing;
+    [HideInInspector] public float boundsWidth;
+    [HideInInspector] public float boundsHeight;
+    
+    public BoxCastOrigins boxCastOrigins;
+    public RaycastOrigins raycastOrigins;
+    public LayerMask collisionMask;    
+    public float skinWidth = .015f;
+    public float distanceBetweenRays = .25f;
+    
+    public virtual void Awake()
+    {
+        boxCollider = GetComponent<BoxCollider2D>();
+    }
 
-	public LayerMask collisionMask;
+    public virtual void Start()
+    {
+        CalculateRaySpacing();
+    }
 
-	public float skinWidth = .015f;
-	public float distanceBetweenRays = .25f;
+    public void CalculateRaySpacing()
+    {
+        var bounds = boxCollider.bounds;
+        // Skin width for ray detection even when boxCollider is flush against surfaces
+        bounds.Expand(skinWidth * -2);
 
-	[HideInInspector] public BoxCollider2D boxCollider;
+        boundsWidth = bounds.size.x;
+        boundsHeight = bounds.size.y;
 
-	[HideInInspector] public int horizontalRayCount;
-	[HideInInspector] public int verticalRayCount;
+        horizontalRayCount = Mathf.RoundToInt(boundsHeight / distanceBetweenRays);
+        verticalRayCount = Mathf.RoundToInt(boundsWidth / distanceBetweenRays);
 
-	[HideInInspector] public float horizontalRaySpacing;
-	[HideInInspector] public float verticalRaySpacing;
+        horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
+        verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
+    }
 
-	public RaycastOrigins raycastOrigins;
-	public BoxCastOrigins boxCastOrigins;
+    public void UpdateRaycastOrigins()
+    {
+        var bounds = boxCollider.bounds;
+        // Skin width for ray detection even when boxCollider is flush against surfaces
+        bounds.Expand(skinWidth * -2);
 
-	[HideInInspector] public float boundsWidth;
-	[HideInInspector] public float boundsHeight;
+        // Match corners of box boxCollider
+        raycastOrigins.bottomLeft = new Vector2(bounds.min.x, bounds.min.y);
+        raycastOrigins.bottomRight = new Vector2(bounds.max.x, bounds.min.y);
+        raycastOrigins.topLeft = new Vector2(bounds.min.x, bounds.max.y);
+        raycastOrigins.topRight = new Vector2(bounds.max.x, bounds.max.y);
+    }
 
-	public virtual void Awake()
-	{
-		boxCollider = GetComponent<BoxCollider2D>();
-	}
+    public void UpdateBoxCastOrigins()
+    {
+        var bounds = boxCollider.bounds;
 
-	public virtual void Start()
-	{
-		CalculateRaySpacing();
-	}
+        boxCastOrigins.bottomCenter = new Vector2(bounds.center.x, bounds.min.y);
+        boxCastOrigins.topCenter = new Vector2(bounds.center.x, bounds.max.y);
+        boxCastOrigins.leftCenter = new Vector2(bounds.min.x, bounds.center.y);
+        boxCastOrigins.rightCenter = new Vector2(bounds.max.x, bounds.center.y);
+    }
 
-	public void CalculateRaySpacing()
-	{
-		Bounds bounds = boxCollider.bounds;
-		// Skin width for ray detection even when boxCollider is flush against surfaces
-		bounds.Expand(skinWidth * -2);
+    public struct RaycastOrigins
+    {
+        public Vector2 bottomLeft, bottomRight;
+        public Vector2 topLeft, topRight;
+    }
 
-		boundsWidth = bounds.size.x;
-		boundsHeight = bounds.size.y;
-
-		horizontalRayCount = Mathf.RoundToInt(boundsHeight / distanceBetweenRays);
-		verticalRayCount = Mathf.RoundToInt(boundsWidth / distanceBetweenRays);
-
-		horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
-		verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
-	}
-
-	public void UpdateRaycastOrigins()
-	{
-		Bounds bounds = boxCollider.bounds;
-		// Skin width for ray detection even when boxCollider is flush against surfaces
-		bounds.Expand(skinWidth * -2);
-
-		// Match corners of box boxCollider
-		raycastOrigins.bottomLeft = new Vector2(bounds.min.x, bounds.min.y);
-		raycastOrigins.bottomRight = new Vector2(bounds.max.x, bounds.min.y);
-		raycastOrigins.topLeft = new Vector2(bounds.min.x, bounds.max.y);
-		raycastOrigins.topRight = new Vector2(bounds.max.x, bounds.max.y);
-	}
-
-	public void UpdateBoxCastOrigins()
-	{
-		Bounds bounds = boxCollider.bounds;
-
-		boxCastOrigins.bottomCenter = new Vector2(bounds.center.x, bounds.min.y);
-		boxCastOrigins.topCenter = new Vector2(bounds.center.x, bounds.max.y);
-		boxCastOrigins.leftCenter = new Vector2(bounds.min.x, bounds.center.y);
-		boxCastOrigins.rightCenter = new Vector2(bounds.max.x, bounds.center.y);
-	}
-
-	public struct RaycastOrigins
-	{
-		public Vector2 bottomLeft, bottomRight;
-		public Vector2 topLeft, topRight;
-	}
-
-	public struct BoxCastOrigins
-	{
-		public Vector2 bottomCenter, topCenter, leftCenter, rightCenter;
-	}
+    public struct BoxCastOrigins
+    {
+        public Vector2 bottomCenter, topCenter, leftCenter, rightCenter;
+    }
 }

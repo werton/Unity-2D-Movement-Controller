@@ -4,139 +4,136 @@ using UnityEngine;
 public class PassengerMover : BoxColliderCasts
 {
     public LayerMask passengerMask;
+    private readonly Dictionary<Transform, Passenger> passengerDictionary = new();
 
-    List<PassengerMovement> passengerMovement;
-    Dictionary<Transform, Passenger> passengerDictionary = new Dictionary<Transform, Passenger>();
+    private List<PassengerMovement> passengerMovement;
 
     public override void Start()
     {
         base.Start();
     }
 
-    void Update()
+    private void Update()
     {
         UpdateBoxCastOrigins();
     }
 
     public void CalculatePassengerMovement(Vector3 displacement)
     {
-        HashSet<Transform> movedPassengers = new HashSet<Transform>();
+        var movedPassengers = new HashSet<Transform>();
         passengerMovement = new List<PassengerMovement>();
 
-        float directionX = Mathf.Sign(displacement.x);
-        float directionY = Mathf.Sign(displacement.y);
+        var directionX = Mathf.Sign(displacement.x);
+        var directionY = Mathf.Sign(displacement.y);
 
         // Vertically moving platform
         if (displacement.y != 0)
         {
-            float rayLength = Mathf.Abs(displacement.y);
+            var rayLength = Mathf.Abs(displacement.y);
 
-            Vector2 boxRayOrigin = (directionY == -1) ? boxCastOrigins.bottomCenter : boxCastOrigins.topCenter;
-            Vector2 boxCastSize = new Vector2(boundsWidth, skinWidth);
-            ContactFilter2D contactFilter2D = new ContactFilter2D();
+            var boxRayOrigin = directionY == -1 ? boxCastOrigins.bottomCenter : boxCastOrigins.topCenter;
+            var boxCastSize = new Vector2(boundsWidth, skinWidth);
+            var contactFilter2D = new ContactFilter2D();
             contactFilter2D.SetLayerMask(passengerMask);
-            List<RaycastHit2D> results = new List<RaycastHit2D>();
+            var results = new List<RaycastHit2D>();
 
-            Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0, Vector2.up * directionY, contactFilter2D, results, rayLength);
+            Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0, Vector2.up * directionY, contactFilter2D, results,
+                rayLength);
 
-            results.ForEach(delegate (RaycastHit2D hit)
+            results.ForEach(delegate(RaycastHit2D hit)
             {
                 if (hit)
-                {
                     if (!movedPassengers.Contains(hit.transform))
                     {
                         movedPassengers.Add(hit.transform);
 
-                        float pushX = (directionY == 1) ? displacement.x : 0;
-                        float pushY = displacement.y - (hit.distance) * directionY;
+                        var pushX = directionY == 1 ? displacement.x : 0;
+                        var pushY = displacement.y - hit.distance * directionY;
 
-                        passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY), directionY == 1, true));
+                        passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY),
+                            directionY == 1, true));
                     }
-                }
             });
         }
 
         // Horizontally moving platform
         if (displacement.x != 0)
         {
-            float rayLength = Mathf.Abs(displacement.x);
+            var rayLength = Mathf.Abs(displacement.x);
 
-            Vector2 boxRayOrigin = (directionX == -1) ? boxCastOrigins.leftCenter : boxCastOrigins.rightCenter;
-            Vector2 boxCastSize = new Vector2(skinWidth, boundsHeight);
-            ContactFilter2D contactFilter2D = new ContactFilter2D();
+            var boxRayOrigin = directionX == -1 ? boxCastOrigins.leftCenter : boxCastOrigins.rightCenter;
+            var boxCastSize = new Vector2(skinWidth, boundsHeight);
+            var contactFilter2D = new ContactFilter2D();
             contactFilter2D.SetLayerMask(passengerMask);
-            List<RaycastHit2D> results = new List<RaycastHit2D>();
+            var results = new List<RaycastHit2D>();
 
-            Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0, Vector2.right * directionX, contactFilter2D, results, rayLength);
+            Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0, Vector2.right * directionX, contactFilter2D, results,
+                rayLength);
 
-            results.ForEach(delegate (RaycastHit2D hit)
+            results.ForEach(delegate(RaycastHit2D hit)
             {
                 if (hit)
-                {
                     if (!movedPassengers.Contains(hit.transform))
                     {
                         movedPassengers.Add(hit.transform);
 
-                        float pushX = displacement.x - (hit.distance - skinWidth) * directionX;
-                        float pushY = -skinWidth;
+                        var pushX = displacement.x - (hit.distance - skinWidth) * directionX;
+                        var pushY = -skinWidth;
 
-                        passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY), false, true));
+                        passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY), false,
+                            true));
                     }
-                }
             });
         }
 
         // Passenger on top of a horizontally or downward moving platform
-        if (directionY == -1 || displacement.y == 0 && displacement.x != 0)
+        if (directionY == -1 || (displacement.y == 0 && displacement.x != 0))
         {
-            Vector2 boxCastSize = new Vector2(boundsWidth, skinWidth);
-            ContactFilter2D contactFilter2D = new ContactFilter2D();
+            var boxCastSize = new Vector2(boundsWidth, skinWidth);
+            var contactFilter2D = new ContactFilter2D();
             contactFilter2D.SetLayerMask(passengerMask);
-            List<RaycastHit2D> results = new List<RaycastHit2D>();
+            var results = new List<RaycastHit2D>();
 
-            Physics2D.BoxCast(boxCastOrigins.topCenter, boxCastSize, 0, Vector2.up, contactFilter2D, results, skinWidth);
+            Physics2D.BoxCast(boxCastOrigins.topCenter, boxCastSize, 0, Vector2.up, contactFilter2D, results,
+                skinWidth);
 
-            results.ForEach(delegate (RaycastHit2D hit)
+            results.ForEach(delegate(RaycastHit2D hit)
             {
                 if (hit)
-                {
                     if (!movedPassengers.Contains(hit.transform))
                     {
                         movedPassengers.Add(hit.transform);
-                        float pushX = displacement.x;
-                        float pushY = displacement.y;
+                        var pushX = displacement.x;
+                        var pushY = displacement.y;
 
-                        passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY), true, false));
+                        passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY), true,
+                            false));
                     }
-                }
             });
         }
     }
 
     public void MovePassengers(bool beforeMovePlatform)
     {
-        foreach (PassengerMovement passenger in passengerMovement)
+        foreach (var passenger in passengerMovement)
         {
             if (!passengerDictionary.ContainsKey(passenger.transform))
-            {
                 passengerDictionary.Add(passenger.transform, passenger.transform.GetComponent<Passenger>());
-            }
 
             if (passenger.moveBeforePlatform == beforeMovePlatform)
-            {
                 passengerDictionary[passenger.transform].Move(passenger.displacement, passenger.standingOnPlatform);
-            }
         }
     }
 
-    struct PassengerMovement
+    private struct PassengerMovement
     {
-        public Transform transform;
-        public Vector3 displacement;
-        public bool standingOnPlatform;
-        public bool moveBeforePlatform;
+        public readonly Transform transform;
+        public readonly Vector3 displacement;
+        public readonly bool standingOnPlatform;
+        public readonly bool moveBeforePlatform;
 
-        public PassengerMovement(Transform _transform, Vector3 _displacement, bool _standingOnPlatform, bool _moveBeforePlatform)
+        public PassengerMovement(Transform _transform, Vector3 _displacement, bool _standingOnPlatform,
+            bool _moveBeforePlatform)
         {
             transform = _transform;
             displacement = _displacement;

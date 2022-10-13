@@ -1,113 +1,106 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class MovingPlatform : MonoBehaviour
 {
+    public Vector3[] localWaypoints;
 
-	public Vector3[] localWaypoints;
-	Vector3[] globalWaypoints;
+    public float speed;
+    public bool cyclic;
+    public float waitTime;
+    [Range(0, 2)] public float easeAmount;
 
-	public float speed;
-	public bool cyclic;
-	public float waitTime;
-	[Range(0, 2)]
-	public float easeAmount;
+    private int fromWaypointIndex;
+    private Vector3[] globalWaypoints;
+    private float nextMoveTime;
 
-	int fromWaypointIndex;
-	float percentBetweenWaypoints;
-	float nextMoveTime;
+    private PassengerMover passengerMover;
+    private float percentBetweenWaypoints;
 
-	PassengerMover passengerMover;
+    private void Start()
+    {
+        globalWaypoints = new Vector3[localWaypoints.Length];
+        for (var i = 0; i < localWaypoints.Length; i++)
+            globalWaypoints[i] = localWaypoints[i] + transform.position;
 
-	void Start()
-	{
+        passengerMover = GetComponent<PassengerMover>();
+    }
 
-		globalWaypoints = new Vector3[localWaypoints.Length];
-		for (int i = 0; i < localWaypoints.Length; i++)
-		{
-			globalWaypoints[i] = localWaypoints[i] + transform.position;
-		}
+    private void Update()
+    {
+        if (globalWaypoints.Length > 0)
+        {
+            var displacement = CalculatePlatformMovement();
 
-		passengerMover = GetComponent<PassengerMover>();
-	}
+            if (passengerMover)
+            {
+                passengerMover.CalculatePassengerMovement(displacement);
 
-	void Update()
-	{
+                passengerMover.MovePassengers(true);
+                transform.Translate(displacement);
+                passengerMover.MovePassengers(false);
+            }
+            else
+            {
+                transform.Translate(displacement);
+            }
+        }
+    }
 
-		if (globalWaypoints.Length > 0)
-		{
-			Vector3 displacement = CalculatePlatformMovement();
+    private void OnDrawGizmos()
+    {
+        if (localWaypoints != null)
+        {
+            Gizmos.color = Color.red;
+            var size = .3f;
 
-			if (passengerMover)
-			{
-				passengerMover.CalculatePassengerMovement(displacement);
+            for (var i = 0; i < localWaypoints.Length; i++)
+            {
+                var globalWaypointPos =
+                    Application.isPlaying ? globalWaypoints[i] : localWaypoints[i] + transform.position;
+                Gizmos.DrawLine(globalWaypointPos - Vector3.up * size, globalWaypointPos + Vector3.up * size);
+                Gizmos.DrawLine(globalWaypointPos - Vector3.left * size, globalWaypointPos + Vector3.left * size);
+            }
+        }
+    }
 
-				passengerMover.MovePassengers(true);
-				transform.Translate(displacement);
-				passengerMover.MovePassengers(false);
+    private float Ease(float x)
+    {
+        var a = easeAmount + 1;
+        return Mathf.Pow(x, a) / (Mathf.Pow(x, a) + Mathf.Pow(1 - x, a));
+    }
 
-			} else
-			{
-				transform.Translate(displacement);
-			}
-		}
-	}
+    private Vector3 CalculatePlatformMovement()
+    {
+        if (Time.time < nextMoveTime)
+            return Vector3.zero;
 
-	float Ease(float x)
-	{
-		float a = easeAmount + 1;
-		return Mathf.Pow(x, a) / (Mathf.Pow(x, a) + Mathf.Pow(1 - x, a));
-	}
+        fromWaypointIndex %= globalWaypoints.Length;
+        var toWaypointIndex = (fromWaypointIndex + 1) % globalWaypoints.Length;
+        var distanceBetweenWaypoints =
+            Vector3.Distance(globalWaypoints[fromWaypointIndex], globalWaypoints[toWaypointIndex]);
+        percentBetweenWaypoints += Time.deltaTime * speed / distanceBetweenWaypoints;
+        percentBetweenWaypoints = Mathf.Clamp01(percentBetweenWaypoints);
+        var easedPercentBetweenWaypoints = Ease(percentBetweenWaypoints);
 
-	Vector3 CalculatePlatformMovement()
-	{
+        var newPos = Vector3.Lerp(globalWaypoints[fromWaypointIndex], globalWaypoints[toWaypointIndex],
+            easedPercentBetweenWaypoints);
 
-		if (Time.time < nextMoveTime)
-		{
-			return Vector3.zero;
-		}
+        if (percentBetweenWaypoints >= 1)
+        {
+            percentBetweenWaypoints = 0;
+            fromWaypointIndex++;
 
-		fromWaypointIndex %= globalWaypoints.Length;
-		int toWaypointIndex = (fromWaypointIndex + 1) % globalWaypoints.Length;
-		float distanceBetweenWaypoints = Vector3.Distance(globalWaypoints[fromWaypointIndex], globalWaypoints[toWaypointIndex]);
-		percentBetweenWaypoints += Time.deltaTime * speed / distanceBetweenWaypoints;
-		percentBetweenWaypoints = Mathf.Clamp01(percentBetweenWaypoints);
-		float easedPercentBetweenWaypoints = Ease(percentBetweenWaypoints);
+            if (!cyclic)
+                if (fromWaypointIndex >= globalWaypoints.Length - 1)
+                {
+                    fromWaypointIndex = 0;
+                    Array.Reverse(globalWaypoints);
+                }
 
-		Vector3 newPos = Vector3.Lerp(globalWaypoints[fromWaypointIndex], globalWaypoints[toWaypointIndex], easedPercentBetweenWaypoints);
+            nextMoveTime = Time.time + waitTime;
+        }
 
-		if (percentBetweenWaypoints >= 1)
-		{
-			percentBetweenWaypoints = 0;
-			fromWaypointIndex++;
-
-			if (!cyclic)
-			{
-				if (fromWaypointIndex >= globalWaypoints.Length - 1)
-				{
-					fromWaypointIndex = 0;
-					System.Array.Reverse(globalWaypoints);
-				}
-			}
-			nextMoveTime = Time.time + waitTime;
-		}
-
-		return newPos - transform.position;
-	}
-
-	void OnDrawGizmos()
-	{
-		if (localWaypoints != null)
-		{
-			Gizmos.color = Color.red;
-			float size = .3f;
-
-			for (int i = 0; i < localWaypoints.Length; i++)
-			{
-				Vector3 globalWaypointPos = (Application.isPlaying) ? globalWaypoints[i] : localWaypoints[i] + transform.position;
-				Gizmos.DrawLine(globalWaypointPos - Vector3.up * size, globalWaypointPos + Vector3.up * size);
-				Gizmos.DrawLine(globalWaypointPos - Vector3.left * size, globalWaypointPos + Vector3.left * size);
-			}
-		}
-	}
-
+        return newPos - transform.position;
+    }
 }
