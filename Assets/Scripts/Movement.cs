@@ -3,29 +3,34 @@ using UnityEngine;
 
 public class Movement : BoxColliderCasts
 {
-    private const float wallAngle = 90;
-    private const float wallTolerence = 1;
-    [HideInInspector] public Vector2 objectInput;
-    [HideInInspector] public bool slidingDownMaxSlope;
-    [HideInInspector] public bool forceFall;
-
-    [SerializeField] [Range(0f, wallAngle - wallTolerence)]
-    private float maxSlopeAngle = 80;
-
-    private bool ascendSlope;
-    [HideInInspector] public CollisionAngle collisionAngle;
-
-    [HideInInspector] public CollisionDirection collisionDirection;
-    private bool descendSlope;
-
-    private int faceDirection;
-    private bool passThroughPlatform;
-
+    public const float WallAngle = 90;
+    public const float WallTolerance = 1;
+    
+    [SerializeField] [Range(0f, WallAngle - WallTolerance)] private float maxSlopeAngle = 80;
+    
+    private CollisionInfo _collisionInfo;
+    private CollisionDirection _collisionDirection; 
+    private int _faceDirection;    
+    private bool _descendSlope;
+    private bool _passThroughPlatform;
+    private bool _ascendSlope;
+    private Vector2 _objectInput;  
+    
+    public bool ForceFall { get; private set; }   
+    public bool SlidingDownMaxSlope { get; private set; }   
+ 
+    public CollisionInfo CollisionInfo => _collisionInfo;
+    public CollisionDirection CollisionDirection => _collisionDirection;
     public override void Start()
     {
         base.Start();
     }
 
+    public void SetForceFall()
+    {
+        ForceFall = true;
+    } 
+    
     /// <summary>
     ///     Checks for collisions then applies correct transform translation to move object
     /// </summary>
@@ -33,14 +38,14 @@ public class Movement : BoxColliderCasts
     {
         ResetDetection();
 
-        objectInput = input;
+        _objectInput = input;
 
         if (displacement.y < 0)
             CheckSlopeDescent(ref displacement);
 
         // Check face direction - done after slope descent in case of sliding down max slope
         if (displacement.x != 0)
-            faceDirection = (int)Mathf.Sign(displacement.x);
+            _faceDirection = (int)Mathf.Sign(displacement.x);
 
         CheckHorizontalCollisions(ref displacement);
 
@@ -50,19 +55,19 @@ public class Movement : BoxColliderCasts
         transform.Translate(displacement);
 
         // Reset grounded variables
-        if (collisionDirection.below)
-            forceFall = false;
+        if (_collisionDirection.below)
+            ForceFall = false;
     }
 
     private void ResetDetection()
     {
         UpdateRaycastOrigins();
         UpdateBoxCastOrigins();
-        collisionDirection.Reset();
-        collisionAngle.Reset();
-        ascendSlope = false;
-        descendSlope = false;
-        slidingDownMaxSlope = false;
+        _collisionDirection.Reset();
+        _collisionInfo.Reset();
+        _ascendSlope = false;
+        _descendSlope = false;
+        SlidingDownMaxSlope = false;
     }
 
     /// <summary>
@@ -70,7 +75,7 @@ public class Movement : BoxColliderCasts
     /// </summary>
     private void CheckHorizontalCollisions(ref Vector2 displacement)
     {
-        float directionX = faceDirection;
+        float directionX = _faceDirection;
 
         // Use 2x skin due box cast origin being brought in 
         var rayLength = Mathf.Abs(displacement.x) + skinWidth * 2;
@@ -97,28 +102,28 @@ public class Movement : BoxColliderCasts
                     continue;
 
                 var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-                collisionAngle.setSlopeAngle(slopeAngle, hit.normal);
+                _collisionInfo.SetSlopeAngle(slopeAngle, hit.normal, WallAngle, WallTolerance);
 
                 // Calc slope movement logic when first ray hit is an allowed angled
                 if (slopeAngle <= maxSlopeAngle)
                 {
-                    if (descendSlope)
-                        descendSlope = false;
+                    if (_descendSlope)
+                        _descendSlope = false;
                     CheckSlopeAscent(ref displacement, slopeAngle);
                 }
 
-                if (!ascendSlope || slopeAngle > maxSlopeAngle)
+                if (!_ascendSlope || slopeAngle > maxSlopeAngle)
                 {
                     // Set displacement be at hit
                     displacement.x = hit.distance * directionX;
 
                     // Adjust y accordingly using tan(angle) = O/A, to prevent further ascend when wall hit
-                    if (ascendSlope)
-                        displacement.y = Mathf.Tan(collisionAngle.slopeAngle * Mathf.Deg2Rad) *
+                    if (_ascendSlope)
+                        displacement.y = Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *
                                          Mathf.Abs(displacement.x);
 
-                    collisionDirection.left = directionX == -1;
-                    collisionDirection.right = directionX == 1;
+                    _collisionDirection.left = directionX == -1;
+                    _collisionDirection.right = directionX == 1;
                 }
             }
         }
@@ -151,11 +156,11 @@ public class Movement : BoxColliderCasts
                 {
                     if (directionY == 1 || hit.distance == 0)
                         continue;
-                    if (passThroughPlatform)
+                    if (_passThroughPlatform)
                         continue;
-                    if (objectInput.y == -1)
+                    if (_objectInput.y == -1)
                     {
-                        passThroughPlatform = true;
+                        _passThroughPlatform = true;
                         Invoke("ResetPassThroughPlatform", .5f);
                         continue;
                     }
@@ -167,12 +172,12 @@ public class Movement : BoxColliderCasts
                 rayLength = hit.distance;
 
                 // Adjust x accordingly using tan(angle) = O/A, to prevent further ascend when ceiling hit
-                if (ascendSlope)
-                    displacement.x = displacement.y / Mathf.Tan(collisionAngle.slopeAngle * Mathf.Deg2Rad) *
+                if (_ascendSlope)
+                    displacement.x = displacement.y / Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *
                                      Mathf.Sign(displacement.x);
 
-                collisionDirection.below = directionY == -1;
-                collisionDirection.above = directionY == 1;
+                _collisionDirection.below = directionY == -1;
+                _collisionDirection.above = directionY == 1;
             }
             else
             {
@@ -184,7 +189,7 @@ public class Movement : BoxColliderCasts
 
     private void ResetPassThroughPlatform()
     {
-        passThroughPlatform = false;
+        _passThroughPlatform = false;
     }
 
     /// <summary>
@@ -203,8 +208,8 @@ public class Movement : BoxColliderCasts
             displacement.y = ascendDisplacementY;
             /// Work out ascendDisplacementX (A) with Cos(angle)=A/H
             displacement.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(displacement.x);
-            collisionDirection.below = true;
-            ascendSlope = true;
+            _collisionDirection.below = true;
+            _ascendSlope = true;
         }
     }
 
@@ -235,7 +240,7 @@ public class Movement : BoxColliderCasts
                 SlideDownMaxSlope(maxSlopeHitRight, ref displacement);
         }
 
-        if (!slidingDownMaxSlope)
+        if (!SlidingDownMaxSlope)
         {
             var directionX = Mathf.Sign(displacement.x);
             var rayOrigin = directionX == -1 ? raycastOrigins.bottomRight : raycastOrigins.bottomLeft;
@@ -245,7 +250,7 @@ public class Movement : BoxColliderCasts
             if (hit)
             {
                 var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-                collisionAngle.setSlopeAngle(slopeAngle, hit.normal);
+                _collisionInfo.SetSlopeAngle(slopeAngle, hit.normal, WallAngle, WallTolerance);
 
                 var descendableSlope = slopeAngle != 0 && slopeAngle <= maxSlopeAngle;
                 var moveInSlopeDirection = Mathf.Sign(hit.normal.x) == directionX;
@@ -263,8 +268,8 @@ public class Movement : BoxColliderCasts
                     displacement.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(displacement.x);
                     displacement.y -= descendDisplacementY;
 
-                    descendSlope = true;
-                    collisionDirection.below = true;
+                    _descendSlope = true;
+                    _collisionDirection.below = true;
                 }
             }
         }
@@ -276,55 +281,14 @@ public class Movement : BoxColliderCasts
     private void SlideDownMaxSlope(RaycastHit2D hit, ref Vector2 displacement)
     {
         var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-        collisionAngle.setSlopeAngle(slopeAngle, hit.normal);
-        if (slopeAngle > maxSlopeAngle && slopeAngle < wallAngle - wallTolerence)
+        _collisionInfo.SetSlopeAngle(slopeAngle, hit.normal, WallAngle, WallTolerance);
+        if (slopeAngle > maxSlopeAngle && slopeAngle < WallAngle - WallTolerance)
         {
             // Calculate accordingly using tan(angle) = O / A, to slide on slope, where x (A), where y (O)
             displacement.x = Mathf.Sign(hit.normal.x) * (Mathf.Abs(displacement.y) - hit.distance) /
                              Mathf.Tan(slopeAngle * Mathf.Deg2Rad);
-            slidingDownMaxSlope = true;
+            SlidingDownMaxSlope = true;
         }
     }
-
-    /// <summary>
-    ///     Contains information about the most recent collision's directions
-    /// </summary>
-    public struct CollisionDirection
-    {
-        public bool above, below;
-        public bool left, right;
-
-        public void Reset()
-        {
-            above = below = false;
-            left = right = false;
-        }
-    }
-
-    /// <summary>
-    ///     Contains information about the most recent collision's slope
-    /// </summary>
-    public struct CollisionAngle
-    {
-        public float slopeAngle;
-        public Vector2 slopeNormal;
-        public bool onWall;
-
-        public void Reset()
-        {
-            slopeAngle = 0;
-            slopeNormal = Vector2.zero;
-            onWall = false;
-        }
-
-        public void setSlopeAngle(float angle, Vector2 normal)
-        {
-            slopeAngle = angle;
-            slopeNormal = normal;
-
-            var wallHit = wallAngle - wallTolerence < slopeAngle && slopeAngle < wallAngle + wallTolerence;
-            if (wallHit)
-                onWall = true;
-        }
-    }
+    
 }

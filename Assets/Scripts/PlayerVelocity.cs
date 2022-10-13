@@ -59,12 +59,12 @@ public class PlayerVelocity : MonoBehaviour
         // Move player using movement controller which checks for collisions then applies correct transform (displacement) translation
         playerMovement.Move(displacement, directionalInput);
 
-        var verticalCollision = playerMovement.collisionDirection.above || playerMovement.collisionDirection.below;
+        var verticalCollision = playerMovement.CollisionDirection.above || playerMovement.CollisionDirection.below;
 
         if (verticalCollision)
         {
-            if (playerMovement.slidingDownMaxSlope)
-                velocity.y += playerMovement.collisionAngle.slopeNormal.y * -gravity * Time.deltaTime;
+            if (playerMovement.SlidingDownMaxSlope)
+                velocity.y += playerMovement.CollisionInfo.slopeNormal.y * -gravity * Time.deltaTime;
             else
                 velocity.y = 0;
         }
@@ -76,18 +76,18 @@ public class PlayerVelocity : MonoBehaviour
         var targetVelocityX = directionalInput.x * moveSpeed;
         oldVelocity = velocity;
         // ms when player is on the ground faster vs. in air
-        var smoothTime = playerMovement.collisionDirection.below ? accelerationTimeGrounded : accelerationTimeAirborne;
+        var smoothTime = playerMovement.CollisionDirection.below ? accelerationTimeGrounded : accelerationTimeAirborne;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, smoothTime);
         velocity.y += gravity * Time.deltaTime;
     }
 
     private void HandleWallSliding()
     {
-        wallDirX = playerMovement.collisionDirection.left ? -1 : 1;
-        var horizontalCollision = playerMovement.collisionDirection.left || playerMovement.collisionDirection.right;
+        wallDirX = playerMovement.CollisionDirection.left ? -1 : 1;
+        var horizontalCollision = playerMovement.CollisionDirection.left || playerMovement.CollisionDirection.right;
 
-        if (horizontalCollision && !playerMovement.collisionDirection.below && !playerMovement.forceFall &&
-            playerMovement.collisionAngle.onWall)
+        if (horizontalCollision && !playerMovement.CollisionDirection.below && !playerMovement.ForceFall &&
+            playerMovement.CollisionInfo.onWall)
         {
             wallContact = true;
 
@@ -166,15 +166,15 @@ public class PlayerVelocity : MonoBehaviour
             }
         }
 
-        if (playerMovement.collisionDirection.below)
+        if (playerMovement.CollisionDirection.below)
         {
-            if (playerMovement.slidingDownMaxSlope)
+            if (playerMovement.SlidingDownMaxSlope)
             {
                 // Jumping away from max slope dir
-                if (directionalInput.x != -Mathf.Sign(playerMovement.collisionAngle.slopeNormal.x))
+                if (directionalInput.x != -Mathf.Sign(playerMovement.CollisionInfo.slopeNormal.x))
                 {
-                    velocity.y = maxJumpVelocity * playerMovement.collisionAngle.slopeNormal.y;
-                    velocity.x = maxJumpVelocity * playerMovement.collisionAngle.slopeNormal.x;
+                    velocity.y = maxJumpVelocity * playerMovement.CollisionInfo.slopeNormal.y;
+                    velocity.x = maxJumpVelocity * playerMovement.CollisionInfo.slopeNormal.x;
                 }
             }
             else
@@ -198,10 +198,10 @@ public class PlayerVelocity : MonoBehaviour
     /// </summary>
     public void OnFallInputDown()
     {
-        if (!playerMovement.collisionDirection.below)
+        if (!playerMovement.CollisionDirection.below)
         {
             velocity.y = -forceFallSpeed;
-            playerMovement.forceFall = true;
+            playerMovement.SetForceFall();
         }
     }
 }

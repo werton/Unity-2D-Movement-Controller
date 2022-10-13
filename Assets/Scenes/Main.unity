@@ -266,11 +266,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 0
-  skinWidth: 0.015
-  distanceBetweenRays: 0.25
   boxCollider: {fileID: 0}
   horizontalRayCount: 0
   verticalRayCount: 0
@@ -278,6 +273,11 @@ MonoBehaviour:
   verticalRaySpacing: 0
   boundsWidth: 0
   boundsHeight: 0
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 0
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
   passengerMask:
     serializedVersion: 2
     m_Bits: 256
@@ -726,11 +726,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 512
-  skinWidth: 0.015
-  distanceBetweenRays: 0.25
   boxCollider: {fileID: 0}
   horizontalRayCount: 0
   verticalRayCount: 0
@@ -738,9 +733,11 @@ MonoBehaviour:
   verticalRaySpacing: 0
   boundsWidth: 0
   boundsHeight: 0
-  objectInput: {x: 0, y: 0}
-  slidingDownMaxSlope: 0
-  forceFall: 0
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 512
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
   maxSlopeAngle: 80
 --- !u!1 &385344275
 GameObject:
@@ -1650,11 +1647,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 512
-  skinWidth: 0.015
-  distanceBetweenRays: 0.25
   boxCollider: {fileID: 0}
   horizontalRayCount: 0
   verticalRayCount: 0
@@ -1662,9 +1654,11 @@ MonoBehaviour:
   verticalRaySpacing: 0
   boundsWidth: 0
   boundsHeight: 0
-  objectInput: {x: 0, y: 0}
-  slidingDownMaxSlope: 0
-  forceFall: 0
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 512
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
   maxSlopeAngle: 80
 --- !u!114 &909861544
 MonoBehaviour:
@@ -1678,11 +1672,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 0
-  skinWidth: 0.015
-  distanceBetweenRays: 0.25
   boxCollider: {fileID: 0}
   horizontalRayCount: 0
   verticalRayCount: 0
@@ -1690,6 +1679,11 @@ MonoBehaviour:
   verticalRaySpacing: 0
   boundsWidth: 0
   boundsHeight: 0
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 0
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
   passengerMask:
     serializedVersion: 2
     m_Bits: 256
@@ -1924,11 +1918,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 512
-  skinWidth: 0.015
-  distanceBetweenRays: 0.25
   boxCollider: {fileID: 0}
   horizontalRayCount: 0
   verticalRayCount: 0
@@ -1936,9 +1925,11 @@ MonoBehaviour:
   verticalRaySpacing: 0
   boundsWidth: 0
   boundsHeight: 0
-  objectInput: {x: 0, y: 0}
-  slidingDownMaxSlope: 0
-  forceFall: 0
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 512
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
   maxSlopeAngle: 80
 --- !u!114 &1186770752
 MonoBehaviour:
@@ -2364,11 +2355,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 1536
-  skinWidth: 0.02
-  distanceBetweenRays: 0.2
   boxCollider: {fileID: 0}
   horizontalRayCount: 0
   verticalRayCount: 0
@@ -2376,10 +2362,12 @@ MonoBehaviour:
   verticalRaySpacing: 0
   boundsWidth: 0
   boundsHeight: 0
-  objectInput: {x: 0, y: 0}
-  slidingDownMaxSlope: 0
-  forceFall: 0
-  maxSlopeAngle: 60
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 1536
+  skinWidth: 0.02
+  distanceBetweenRays: 0.2
+  maxSlopeAngle: 60.7
 --- !u!114 &1371044444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2403,7 +2391,7 @@ MonoBehaviour:
   wallJumpClimb: {x: 5, y: 15}
   wallLeapOff: {x: 15, y: 15}
   wallSlideSpeedMax: 3
-  wallStickTime: 0
+  wallStickTime: 0.25
 --- !u!114 &1371044445
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2707,11 +2695,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 0
-  skinWidth: 0.015
-  distanceBetweenRays: 0.25
   boxCollider: {fileID: 0}
   horizontalRayCount: 0
   verticalRayCount: 0
@@ -2719,6 +2702,11 @@ MonoBehaviour:
   verticalRaySpacing: 0
   boundsWidth: 0
   boundsHeight: 0
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 0
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
   passengerMask:
     serializedVersion: 2
     m_Bits: 1280
@@ -2867,11 +2855,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 0
-  skinWidth: 0.015
-  distanceBetweenRays: 0.25
   boxCollider: {fileID: 0}
   horizontalRayCount: 0
   verticalRayCount: 0
@@ -2879,6 +2862,11 @@ MonoBehaviour:
   verticalRaySpacing: 0
   boundsWidth: 0
   boundsHeight: 0
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 0
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
   passengerMask:
     serializedVersion: 2
     m_Bits: 2304
@@ -3208,11 +3196,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 0
-  skinWidth: 0.015
-  distanceBetweenRays: 0.25
   boxCollider: {fileID: 0}
   horizontalRayCount: 0
   verticalRayCount: 0
@@ -3220,6 +3203,11 @@ MonoBehaviour:
   verticalRaySpacing: 0
   boundsWidth: 0
   boundsHeight: 0
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 0
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
   passengerMask:
     serializedVersion: 2
     m_Bits: 1280

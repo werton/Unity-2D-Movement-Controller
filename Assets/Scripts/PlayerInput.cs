@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerVelocity))]
 public class PlayerInput : MonoBehaviour
 {
-    private PlayerVelocity playerVelocity;
+    private PlayerVelocity _playerVelocity;
     public InputControl Input { get; private set; }
 
     private void Awake()
@@ -17,7 +17,7 @@ public class PlayerInput : MonoBehaviour
 
     private void Start()
     {
-        playerVelocity = GetComponent<PlayerVelocity>();
+        _playerVelocity = GetComponent<PlayerVelocity>();
     }
 
     private void OnEnable()
@@ -37,18 +37,18 @@ public class PlayerInput : MonoBehaviour
     {
         var horizontalDirection = context.ReadValue<Vector2>();
 
-        playerVelocity.SetDirectionalInput(horizontalDirection);
+        _playerVelocity.SetDirectionalInput(horizontalDirection);
 
         if (horizontalDirection.y > 0)
-            playerVelocity.OnJumpInputDown();
+            _playerVelocity.OnJumpInputDown();
 
         if (horizontalDirection.y < 0)
-            playerVelocity.OnFallInputDown();
+            _playerVelocity.OnFallInputDown();
     }
 
     public void OnKeyJump(InputAction.CallbackContext context)
     {
         if (context.performed)
-            playerVelocity.OnJumpInputDown();
+            _playerVelocity.OnJumpInputDown();
     }
 }
