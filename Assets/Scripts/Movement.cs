@@ -17,10 +17,10 @@ public class Movement : BoxColliderCasts
     private Vector2 _objectInput;  
     
     public bool ForceFall { get; private set; }   
-    public bool SlidingDownMaxSlope { get; private set; }   
- 
+    public bool SlidingDownMaxSlope { get; private set; }
     public CollisionInfo CollisionInfo => _collisionInfo;
     public CollisionDirection CollisionDirection => _collisionDirection;
+    
     public override void Start()
     {
         base.Start();
@@ -78,12 +78,12 @@ public class Movement : BoxColliderCasts
         float directionX = _faceDirection;
 
         // Use 2x skin due box cast origin being brought in 
-        var rayLength = Mathf.Abs(displacement.x) + skinWidth * 2;
+        var rayLength = Mathf.Abs(displacement.x) + SkinWidth * 2;
 
-        var boxRayOrigin = directionX == -1 ? boxCastOrigins.leftCenter : boxCastOrigins.rightCenter;
-        boxRayOrigin -= Vector2.right * directionX * skinWidth;
+        var boxRayOrigin = directionX == -1 ? BoxCastOrigins.leftCenter : BoxCastOrigins.rightCenter;
+        boxRayOrigin -= Vector2.right * directionX * SkinWidth;
 
-        var boxCastSize = new Vector2(skinWidth, boundsHeight - skinWidth);
+        var boxCastSize = new Vector2(SkinWidth, BoundsHeight - SkinWidth);
 
         var contactFilter2D = new ContactFilter2D();
         contactFilter2D.SetLayerMask(collisionMask);
@@ -136,14 +136,14 @@ public class Movement : BoxColliderCasts
     private void CheckVerticalCollisions(ref Vector2 displacement)
     {
         var directionY = Mathf.Sign(displacement.y);
-        var rayLength = Mathf.Abs(displacement.y) + skinWidth;
+        var rayLength = Mathf.Abs(displacement.y) + SkinWidth;
 
-        for (var i = 0; i < verticalRayCount; i++)
+        for (var i = 0; i < VerticalRayCount; i++)
         {
             // Send out rays to check for collisions for given layer in y dir, starting based on whether travelling up/down
-            var rayOrigin = directionY == -1 ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
+            var rayOrigin = directionY == -1 ? RaycastOrigins.bottomLeft : RaycastOrigins.topLeft;
             // Note additional distance from movement in x dir needed to adjust rayOrigin correctly
-            rayOrigin += Vector2.right * (verticalRaySpacing * i + displacement.x);
+            rayOrigin += Vector2.right * (VerticalRaySpacing * i + displacement.x);
             var hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
 
             if (hit)
@@ -167,7 +167,7 @@ public class Movement : BoxColliderCasts
                 }
 
                 // Move object to just before the hit ray
-                displacement.y = (hit.distance - skinWidth) * directionY;
+                displacement.y = (hit.distance - SkinWidth) * directionY;
                 // Adjust ray length to make sure future rays don't lead to further movement past current hit
                 rayLength = hit.distance;
 
@@ -220,10 +220,10 @@ public class Movement : BoxColliderCasts
     private void CheckSlopeDescent(ref Vector2 displacement)
     {
         // Check for max slope angle hits, XOR ensures only on side checked at a time
-        var maxSlopeHitLeft = Physics2D.Raycast(raycastOrigins.bottomLeft, Vector2.down,
-            Mathf.Abs(displacement.y) + skinWidth, collisionMask);
-        var maxSlopeHitRight = Physics2D.Raycast(raycastOrigins.bottomRight, Vector2.down,
-            Mathf.Abs(displacement.y) + skinWidth, collisionMask);
+        var maxSlopeHitLeft = Physics2D.Raycast(RaycastOrigins.bottomLeft, Vector2.down,
+            Mathf.Abs(displacement.y) + SkinWidth, collisionMask);
+        var maxSlopeHitRight = Physics2D.Raycast(RaycastOrigins.bottomRight, Vector2.down,
+            Mathf.Abs(displacement.y) + SkinWidth, collisionMask);
         if (maxSlopeHitLeft ^ maxSlopeHitRight)
         {
             if (maxSlopeHitLeft)
@@ -243,7 +243,7 @@ public class Movement : BoxColliderCasts
         if (!SlidingDownMaxSlope)
         {
             var directionX = Mathf.Sign(displacement.x);
-            var rayOrigin = directionX == -1 ? raycastOrigins.bottomRight : raycastOrigins.bottomLeft;
+            var rayOrigin = directionX == -1 ? RaycastOrigins.bottomRight : RaycastOrigins.bottomLeft;
             // Cast ray downwards infinitly to check for slope
             var hit = Physics2D.Raycast(rayOrigin, -Vector2.up, Mathf.Infinity, collisionMask);
 
@@ -255,7 +255,7 @@ public class Movement : BoxColliderCasts
                 var descendableSlope = slopeAngle != 0 && slopeAngle <= maxSlopeAngle;
                 var moveInSlopeDirection = Mathf.Sign(hit.normal.x) == directionX;
                 // Calculate accordingly using tan(angle) = O/A, to prevent further falling when slope hit
-                var fallingToSlope = hit.distance - skinWidth <=
+                var fallingToSlope = hit.distance - SkinWidth <=
                                      Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(displacement.x);
 
                 if (descendableSlope && moveInSlopeDirection && fallingToSlope)

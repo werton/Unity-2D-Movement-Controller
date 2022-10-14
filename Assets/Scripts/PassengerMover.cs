@@ -31,8 +31,8 @@ public class PassengerMover : BoxColliderCasts
         {
             var rayLength = Mathf.Abs(displacement.y);
 
-            var boxRayOrigin = directionY == -1 ? boxCastOrigins.bottomCenter : boxCastOrigins.topCenter;
-            var boxCastSize = new Vector2(boundsWidth, skinWidth);
+            var boxRayOrigin = directionY == -1 ? BoxCastOrigins.bottomCenter : BoxCastOrigins.topCenter;
+            var boxCastSize = new Vector2(BoundsWidth, SkinWidth);
             var contactFilter2D = new ContactFilter2D();
             contactFilter2D.SetLayerMask(passengerMask);
             var results = new List<RaycastHit2D>();
@@ -61,8 +61,8 @@ public class PassengerMover : BoxColliderCasts
         {
             var rayLength = Mathf.Abs(displacement.x);
 
-            var boxRayOrigin = directionX == -1 ? boxCastOrigins.leftCenter : boxCastOrigins.rightCenter;
-            var boxCastSize = new Vector2(skinWidth, boundsHeight);
+            var boxRayOrigin = directionX == -1 ? BoxCastOrigins.leftCenter : BoxCastOrigins.rightCenter;
+            var boxCastSize = new Vector2(SkinWidth, BoundsHeight);
             var contactFilter2D = new ContactFilter2D();
             contactFilter2D.SetLayerMask(passengerMask);
             var results = new List<RaycastHit2D>();
@@ -77,8 +77,8 @@ public class PassengerMover : BoxColliderCasts
                     {
                         movedPassengers.Add(hit.transform);
 
-                        var pushX = displacement.x - (hit.distance - skinWidth) * directionX;
-                        var pushY = -skinWidth;
+                        var pushX = displacement.x - (hit.distance - SkinWidth) * directionX;
+                        var pushY = -SkinWidth;
 
                         passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY), false,
                             true));
@@ -89,13 +89,13 @@ public class PassengerMover : BoxColliderCasts
         // Passenger on top of a horizontally or downward moving platform
         if (directionY == -1 || (displacement.y == 0 && displacement.x != 0))
         {
-            var boxCastSize = new Vector2(boundsWidth, skinWidth);
+            var boxCastSize = new Vector2(BoundsWidth, SkinWidth);
             var contactFilter2D = new ContactFilter2D();
             contactFilter2D.SetLayerMask(passengerMask);
             var results = new List<RaycastHit2D>();
 
-            Physics2D.BoxCast(boxCastOrigins.topCenter, boxCastSize, 0, Vector2.up, contactFilter2D, results,
-                skinWidth);
+            Physics2D.BoxCast(BoxCastOrigins.topCenter, boxCastSize, 0, Vector2.up, contactFilter2D, results,
+                SkinWidth);
 
             results.ForEach(delegate(RaycastHit2D hit)
             {
