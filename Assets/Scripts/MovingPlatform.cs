@@ -4,41 +4,39 @@ using UnityEngine;
 public class MovingPlatform : MonoBehaviour
 {
     [SerializeField] private Vector3[] _localWaypoints;
-
-    public float speed;
-    public bool cyclic;
-    public float waitTime;
-    [Range(0, 2)] public float easeAmount;
-
-    private int fromWaypointIndex;
-    private Vector3[] globalWaypoints;
-    private float nextMoveTime;
-
-    private PassengerMover passengerMover;
-    private float percentBetweenWaypoints;
-
+    [SerializeField] private float _speed = 2;
+    [SerializeField] private bool _cyclic = true;
+    [SerializeField] private float _waitTime = 0;
+    [SerializeField] [Range(0, 2)] private float _easeAmount = 0;
+    
+    private PassengerMover _passengerMover;
+    private Vector3[] _globalWaypoints;
+    private float _nextMoveTime;
+    private float _percentBetweenWaypoints;
+    private int _fromWaypointIndex;
+    
     private void Start()
     {
-        globalWaypoints = new Vector3[_localWaypoints.Length];
+        _globalWaypoints = new Vector3[_localWaypoints.Length];
         for (var i = 0; i < _localWaypoints.Length; i++)
-            globalWaypoints[i] = _localWaypoints[i] + transform.position;
+            _globalWaypoints[i] = _localWaypoints[i] + transform.position;
 
-        passengerMover = GetComponent<PassengerMover>();
+        _passengerMover = GetComponent<PassengerMover>();
     }
 
     private void Update()
     {
-        if (globalWaypoints.Length > 0)
+        if (_globalWaypoints.Length > 0)
         {
             var displacement = CalculatePlatformMovement();
 
-            if (passengerMover)
+            if (_passengerMover)
             {
-                passengerMover.CalculatePassengerMovement(displacement);
+                _passengerMover.CalculatePassengerMovement(displacement);
 
-                passengerMover.MovePassengers(true);
+                _passengerMover.MovePassengers(true);
                 transform.Translate(displacement);
-                passengerMover.MovePassengers(false);
+                _passengerMover.MovePassengers(false);
             }
             else
             {
@@ -57,7 +55,7 @@ public class MovingPlatform : MonoBehaviour
             for (var i = 0; i < _localWaypoints.Length; i++)
             {
                 var globalWaypointPos =
-                    Application.isPlaying ? globalWaypoints[i] : _localWaypoints[i] + transform.position;
+                    Application.isPlaying ? _globalWaypoints[i] : _localWaypoints[i] + transform.position;
                 Gizmos.DrawLine(globalWaypointPos - Vector3.up * size, globalWaypointPos + Vector3.up * size);
                 Gizmos.DrawLine(globalWaypointPos - Vector3.left * size, globalWaypointPos + Vector3.left * size);
             }
@@ -66,39 +64,39 @@ public class MovingPlatform : MonoBehaviour
 
     private float Ease(float x)
     {
-        var a = easeAmount + 1;
+        var a = _easeAmount + 1;
         return Mathf.Pow(x, a) / (Mathf.Pow(x, a) + Mathf.Pow(1 - x, a));
     }
 
     private Vector3 CalculatePlatformMovement()
     {
-        if (Time.time < nextMoveTime)
+        if (Time.time < _nextMoveTime)
             return Vector3.zero;
 
-        fromWaypointIndex %= globalWaypoints.Length;
-        var toWaypointIndex = (fromWaypointIndex + 1) % globalWaypoints.Length;
+        _fromWaypointIndex %= _globalWaypoints.Length;
+        var toWaypointIndex = (_fromWaypointIndex + 1) % _globalWaypoints.Length;
         var distanceBetweenWaypoints =
-            Vector3.Distance(globalWaypoints[fromWaypointIndex], globalWaypoints[toWaypointIndex]);
-        percentBetweenWaypoints += Time.deltaTime * speed / distanceBetweenWaypoints;
-        percentBetweenWaypoints = Mathf.Clamp01(percentBetweenWaypoints);
-        var easedPercentBetweenWaypoints = Ease(percentBetweenWaypoints);
+            Vector3.Distance(_globalWaypoints[_fromWaypointIndex], _globalWaypoints[toWaypointIndex]);
+        _percentBetweenWaypoints += Time.deltaTime * _speed / distanceBetweenWaypoints;
+        _percentBetweenWaypoints = Mathf.Clamp01(_percentBetweenWaypoints);
+        var easedPercentBetweenWaypoints = Ease(_percentBetweenWaypoints);
 
-        var newPos = Vector3.Lerp(globalWaypoints[fromWaypointIndex], globalWaypoints[toWaypointIndex],
+        var newPos = Vector3.Lerp(_globalWaypoints[_fromWaypointIndex], _globalWaypoints[toWaypointIndex],
             easedPercentBetweenWaypoints);
 
-        if (percentBetweenWaypoints >= 1)
+        if (_percentBetweenWaypoints >= 1)
         {
-            percentBetweenWaypoints = 0;
-            fromWaypointIndex++;
+            _percentBetweenWaypoints = 0;
+            _fromWaypointIndex++;
 
-            if (!cyclic)
-                if (fromWaypointIndex >= globalWaypoints.Length - 1)
+            if (!_cyclic)
+                if (_fromWaypointIndex >= _globalWaypoints.Length - 1)
                 {
-                    fromWaypointIndex = 0;
-                    Array.Reverse(globalWaypoints);
+                    _fromWaypointIndex = 0;
+                    Array.Reverse(_globalWaypoints);
                 }
 
-            nextMoveTime = Time.time + waitTime;
+            _nextMoveTime = Time.time + _waitTime;
         }
 
         return newPos - transform.position;
