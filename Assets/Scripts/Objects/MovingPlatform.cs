@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class MovingPlatform : MonoBehaviour
+public class MovingPlatform : Platform
 {
     [SerializeField] private Vector3[] _localWaypoints;
     [SerializeField] private float _speed = 2;

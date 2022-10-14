@@ -5,14 +5,14 @@ using UnityEngine.InputSystem;
 public class PlayerInput : MonoBehaviour
 {
     private PlayerVelocity _playerVelocity;
-    public InputControl Input { get; private set; }
+    private InputControl _input;
 
     private void Awake()
     {
-        Input = new InputControl();
-        Input.Player.Jump.performed += OnKeyJump;
-        Input.Player.Move.performed += OnKeyMove;
-        Input.Player.Move.canceled += OnKeyMove;
+        _input = new InputControl();
+        _input.Player.Jump.performed += OnKeyJump;
+        _input.Player.Move.performed += OnKeyMove;
+        _input.Player.Move.canceled += OnKeyMove;
     }
 
     private void Start()
@@ -22,18 +22,18 @@ public class PlayerInput : MonoBehaviour
 
     private void OnEnable()
     {
-        Input.Enable();
+        _input.Enable();
     }
 
     private void OnDisable()
     {
-        Input.Disable();
-        Input.Player.Jump.performed -= OnKeyJump;
-        Input.Player.Move.performed -= OnKeyMove;
-        Input.Player.Move.canceled -= OnKeyMove;
+        _input.Disable();
+        _input.Player.Jump.performed -= OnKeyJump;
+        _input.Player.Move.performed -= OnKeyMove;
+        _input.Player.Move.canceled -= OnKeyMove;
     }
 
-    public void OnKeyMove(InputAction.CallbackContext context)
+    private void OnKeyMove(InputAction.CallbackContext context)
     {
         var horizontalDirection = context.ReadValue<Vector2>();
 
@@ -46,7 +46,7 @@ public class PlayerInput : MonoBehaviour
             _playerVelocity.OnFallInputDown();
     }
 
-    public void OnKeyJump(InputAction.CallbackContext context)
+    private void OnKeyJump(InputAction.CallbackContext context)
     {
         if (context.performed)
             _playerVelocity.OnJumpInputDown();
