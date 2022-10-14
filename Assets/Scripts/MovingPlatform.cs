@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class MovingPlatform : MonoBehaviour
 {
-    public Vector3[] localWaypoints;
+    [SerializeField] private Vector3[] _localWaypoints;
 
     public float speed;
     public bool cyclic;
@@ -19,9 +19,9 @@ public class MovingPlatform : MonoBehaviour
 
     private void Start()
     {
-        globalWaypoints = new Vector3[localWaypoints.Length];
-        for (var i = 0; i < localWaypoints.Length; i++)
-            globalWaypoints[i] = localWaypoints[i] + transform.position;
+        globalWaypoints = new Vector3[_localWaypoints.Length];
+        for (var i = 0; i < _localWaypoints.Length; i++)
+            globalWaypoints[i] = _localWaypoints[i] + transform.position;
 
         passengerMover = GetComponent<PassengerMover>();
     }
@@ -49,15 +49,15 @@ public class MovingPlatform : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (localWaypoints != null)
+        if (_localWaypoints != null)
         {
             Gizmos.color = Color.red;
             var size = .3f;
 
-            for (var i = 0; i < localWaypoints.Length; i++)
+            for (var i = 0; i < _localWaypoints.Length; i++)
             {
                 var globalWaypointPos =
-                    Application.isPlaying ? globalWaypoints[i] : localWaypoints[i] + transform.position;
+                    Application.isPlaying ? globalWaypoints[i] : _localWaypoints[i] + transform.position;
                 Gizmos.DrawLine(globalWaypointPos - Vector3.up * size, globalWaypointPos + Vector3.up * size);
                 Gizmos.DrawLine(globalWaypointPos - Vector3.left * size, globalWaypointPos + Vector3.left * size);
             }
