@@ -60,9 +60,9 @@ public class PlayerVelocity : MonoBehaviour
 
         // r = r0 + 1/2(v+v0)t, note Vector version used here
         // displacement = 1/2(v+v0)t since the playerMovementController uses Translate which moves from r0
-        var displacement = (_velocity + _oldVelocity) * 0.5f * Time.deltaTime;
+        var offset = (_velocity + _oldVelocity) * 0.5f * Time.deltaTime;
         // Move player using movement controller which checks for collisions then applies correct transform (displacement) translation
-        _playerMovement.Move(displacement, _directionalInput);
+        _playerMovement.Move(offset, _directionalInput);
 
         var verticalCollision = _playerMovement.CollisionDirection.above || _playerMovement.CollisionDirection.below;
 
@@ -91,6 +91,7 @@ public class PlayerVelocity : MonoBehaviour
         _wallDirX = _playerMovement.CollisionDirection.left ? -1 : 1;
         var horizontalCollision = _playerMovement.CollisionDirection.left || _playerMovement.CollisionDirection.right;
 
+
         if (horizontalCollision && !_playerMovement.CollisionDirection.below && !_playerMovement.ForceFall &&
             _playerMovement.CollisionInfo.onWall)
         {
@@ -108,7 +109,9 @@ public class PlayerVelocity : MonoBehaviour
                 {
                     // Only slow down if falling faster than slide speed
                     if (_velocity.y < -_wallSlideSpeedMax)
+                    {
                         _velocity.y = -_wallSlideSpeedMax;
+                    }
 
                     // Stick to wall until timeToWallUnstick has counted down to 0 from wallStickTime
                     if (_timeToWallUnstick > 0)

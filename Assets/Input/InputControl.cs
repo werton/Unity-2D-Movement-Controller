@@ -283,6 +283,15 @@ public partial class @InputControl : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ReloadScene"",
+                    ""type"": ""Button"",
+                    ""id"": ""02a3dd08-f0af-49fa-888b-d1756979cb6d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -316,6 +325,17 @@ public partial class @InputControl : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
                     ""action"": ""SetNormalGameSpeed"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0f59e4ef-5387-49f1-8fc2-f8ffaca08629"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""ReloadScene"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -364,6 +384,7 @@ public partial class @InputControl : IInputActionCollection2, IDisposable
         m_Debug_SpeedUpGame = m_Debug.FindAction("SpeedUpGame", throwIfNotFound: true);
         m_Debug_SpeedDownGame = m_Debug.FindAction("SpeedDownGame", throwIfNotFound: true);
         m_Debug_SetNormalGameSpeed = m_Debug.FindAction("SetNormalGameSpeed", throwIfNotFound: true);
+        m_Debug_ReloadScene = m_Debug.FindAction("ReloadScene", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -500,6 +521,7 @@ public partial class @InputControl : IInputActionCollection2, IDisposable
     private readonly InputAction m_Debug_SpeedUpGame;
     private readonly InputAction m_Debug_SpeedDownGame;
     private readonly InputAction m_Debug_SetNormalGameSpeed;
+    private readonly InputAction m_Debug_ReloadScene;
     public struct DebugActions
     {
         private @InputControl m_Wrapper;
@@ -507,6 +529,7 @@ public partial class @InputControl : IInputActionCollection2, IDisposable
         public InputAction @SpeedUpGame => m_Wrapper.m_Debug_SpeedUpGame;
         public InputAction @SpeedDownGame => m_Wrapper.m_Debug_SpeedDownGame;
         public InputAction @SetNormalGameSpeed => m_Wrapper.m_Debug_SetNormalGameSpeed;
+        public InputAction @ReloadScene => m_Wrapper.m_Debug_ReloadScene;
         public InputActionMap Get() { return m_Wrapper.m_Debug; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -525,6 +548,9 @@ public partial class @InputControl : IInputActionCollection2, IDisposable
                 @SetNormalGameSpeed.started -= m_Wrapper.m_DebugActionsCallbackInterface.OnSetNormalGameSpeed;
                 @SetNormalGameSpeed.performed -= m_Wrapper.m_DebugActionsCallbackInterface.OnSetNormalGameSpeed;
                 @SetNormalGameSpeed.canceled -= m_Wrapper.m_DebugActionsCallbackInterface.OnSetNormalGameSpeed;
+                @ReloadScene.started -= m_Wrapper.m_DebugActionsCallbackInterface.OnReloadScene;
+                @ReloadScene.performed -= m_Wrapper.m_DebugActionsCallbackInterface.OnReloadScene;
+                @ReloadScene.canceled -= m_Wrapper.m_DebugActionsCallbackInterface.OnReloadScene;
             }
             m_Wrapper.m_DebugActionsCallbackInterface = instance;
             if (instance != null)
@@ -538,6 +564,9 @@ public partial class @InputControl : IInputActionCollection2, IDisposable
                 @SetNormalGameSpeed.started += instance.OnSetNormalGameSpeed;
                 @SetNormalGameSpeed.performed += instance.OnSetNormalGameSpeed;
                 @SetNormalGameSpeed.canceled += instance.OnSetNormalGameSpeed;
+                @ReloadScene.started += instance.OnReloadScene;
+                @ReloadScene.performed += instance.OnReloadScene;
+                @ReloadScene.canceled += instance.OnReloadScene;
             }
         }
     }
@@ -583,5 +612,6 @@ public partial class @InputControl : IInputActionCollection2, IDisposable
         void OnSpeedUpGame(InputAction.CallbackContext context);
         void OnSpeedDownGame(InputAction.CallbackContext context);
         void OnSetNormalGameSpeed(InputAction.CallbackContext context);
+        void OnReloadScene(InputAction.CallbackContext context);
     }
 }

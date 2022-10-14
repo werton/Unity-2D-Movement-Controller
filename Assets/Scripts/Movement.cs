@@ -6,6 +6,7 @@ public class Movement : BoxColliderCasts
 {
     private const float WallAngle = 90;
     private const float WallTolerance = 1;
+    private const float ShellRadius = .03f;
     
     [SerializeField] [Range(0f, WallAngle - WallTolerance)] private float _maxSlopeAngle = 60;
     
@@ -16,7 +17,9 @@ public class Movement : BoxColliderCasts
     private bool _passThroughPlatform;
     private bool _ascendSlope;
     private Vector2 _objectInput;  
+    private RaycastHit2D[] _raycastHits = new RaycastHit2D[1];
     
+
     public bool ForceFall { get; private set; }   
     public bool SlidingDownMaxSlope { get; private set; }
     public CollisionInfo CollisionInfo => _collisionInfo;
@@ -35,25 +38,28 @@ public class Movement : BoxColliderCasts
     /// <summary>
     ///     Checks for collisions then applies correct transform translation to move object
     /// </summary>
-    public void Move(Vector2 displacement, Vector2 input)
+    public void Move(Vector2 offset, Vector2 input)
     {
         ResetDetection();
 
         _objectInput = input;
 
-        if (displacement.y < 0)
-            CheckSlopeDescent(ref displacement);
+        if (offset.y < 0)
+            CheckSlopeDescent(ref offset);
 
         // Check face direction - done after slope descent in case of sliding down max slope
-        if (displacement.x != 0)
-            _faceDirection = Math.Sign(displacement.x);
+        if (offset.x != 0)
+        {
+            _faceDirection = Math.Sign(offset.x);
+        }     
+        
+        TryMoveHorizontally(ref offset, _faceDirection);
 
-        CheckHorizontalCollisions(ref displacement, _faceDirection);
 
-        if (displacement.y != 0)
-            CheckVerticalCollisions(ref displacement);
+        if (offset.y != 0)
+            TryMoveVertically(ref offset);
 
-        transform.Translate(displacement);
+        transform.Translate(offset);
 
         // Reset grounded variables
         if (_collisionDirection.below)
@@ -74,10 +80,10 @@ public class Movement : BoxColliderCasts
     /// <summary>
     ///     Check horizontal collisions using box cast (more smooth than ray cast), if angle hit found check for ascent
     /// </summary>
-    private void CheckHorizontalCollisions(ref Vector2 displacement, int directionX)
+    private void TryMoveHorizontally(ref Vector2 offset, int directionX)
     {
         // Use 2x skin due box cast origin being brought in 
-        var rayLength = Math.Abs(displacement.x) + SkinWidth * 2;
+        var rayLength = Math.Abs(offset.x) + SkinWidth * 2;
 
         var boxRayOrigin = directionX == -1 ? BoxCastOrigins.leftCenter : BoxCastOrigins.rightCenter;
         boxRayOrigin -= Vector2.right * directionX * SkinWidth;
@@ -87,14 +93,15 @@ public class Movement : BoxColliderCasts
         var contactFilter2D = new ContactFilter2D();
         contactFilter2D.SetLayerMask(collisionMask);
 
-        var results = new List<RaycastHit2D>();
-
-        Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0, Vector2.right * directionX, contactFilter2D, results,
-            rayLength);
-
-        for (var i = 0; i < results.Count; i++)
+        int raycastHit2D = Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0,
+            Vector2.right * directionX, contactFilter2D, _raycastHits, rayLength + ShellRadius);
+        
+        if (raycastHit2D == 0)
+            return;
+        
+        for (var i = 0; i < _raycastHits.Length; i++)
         {
-            var hit = results[i];
+            var hit = _raycastHits[i];
             
             if (hit == false)
                 return;
@@ -110,18 +117,18 @@ public class Movement : BoxColliderCasts
             {
                 if (_descendSlope)
                     _descendSlope = false;
-                CheckSlopeAscent(ref displacement, slopeAngle);
+                CheckSlopeAscent(ref offset, slopeAngle);
             }
 
             if (!_ascendSlope || slopeAngle > _maxSlopeAngle)
             {
                 // Set displacement be at hit
-                displacement.x = hit.distance * directionX;
+                offset.x = (hit.distance - ShellRadius) * directionX;
 
                 // Adjust y accordingly using tan(angle) = O/A, to prevent further ascend when wall hit
                 if (_ascendSlope)
-                    displacement.y = Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *
-                                     Mathf.Abs(displacement.x);
+                    offset.y = Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *
+                                     Mathf.Abs(offset.x);
 
                 _collisionDirection.left = directionX == -1;
                 _collisionDirection.right = directionX == 1;
@@ -134,15 +141,15 @@ public class Movement : BoxColliderCasts
     ///     Check vertical collisions using ray cast - not using box cast here as it starts to interfere with horizontal box
     ///     cast / slopes
     /// </summary>
-    private void CheckVerticalCollisions(ref Vector2 displacement)
+    private void TryMoveVertically(ref Vector2 displacement)
     {
-        var directionY = Mathf.Sign(displacement.y);
-        var rayLength = Mathf.Abs(displacement.y) + SkinWidth;
+        int directionY = Math.Sign(displacement.y);
+        float rayLength = Math.Abs(displacement.y) + SkinWidth;
 
         for (var i = 0; i < VerticalRayCount; i++)
         {
             // Send out rays to check for collisions for given layer in y dir, starting based on whether travelling up/down
-            var rayOrigin = directionY == -1 ? RaycastOrigins.bottomLeft : RaycastOrigins.topLeft;
+            Vector2 rayOrigin = directionY == -1 ? RaycastOrigins.bottomLeft : RaycastOrigins.topLeft;
             // Note additional distance from movement in x dir needed to adjust rayOrigin correctly
             rayOrigin += Vector2.right * (VerticalRaySpacing * i + displacement.x);
             var hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
@@ -225,6 +232,7 @@ public class Movement : BoxColliderCasts
             Mathf.Abs(displacement.y) + SkinWidth, collisionMask);
         var maxSlopeHitRight = Physics2D.Raycast(RaycastOrigins.bottomRight, Vector2.down,
             Mathf.Abs(displacement.y) + SkinWidth, collisionMask);
+        
         if (maxSlopeHitLeft ^ maxSlopeHitRight)
         {
             if (maxSlopeHitLeft)
@@ -243,7 +251,7 @@ public class Movement : BoxColliderCasts
 
         if (!SlidingDownMaxSlope)
         {
-            var directionX = Mathf.Sign(displacement.x);
+            var directionX = Math.Sign(displacement.x);
             var rayOrigin = directionX == -1 ? RaycastOrigins.bottomRight : RaycastOrigins.bottomLeft;
             // Cast ray downwards infinitly to check for slope
             var hit = Physics2D.Raycast(rayOrigin, -Vector2.up, Mathf.Infinity, collisionMask);

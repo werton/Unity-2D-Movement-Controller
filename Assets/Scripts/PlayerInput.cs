@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PlayerVelocity))]
 public class PlayerInput : MonoBehaviour
@@ -13,6 +14,7 @@ public class PlayerInput : MonoBehaviour
         _input.Player.Jump.performed += OnKeyJump;
         _input.Player.Move.performed += OnKeyMove;
         _input.Player.Move.canceled += OnKeyMove;
+        _input.Debug.ReloadScene.performed += context => ReloadScene();
     }
 
     private void Start()
@@ -50,5 +52,9 @@ public class PlayerInput : MonoBehaviour
     {
         if (context.performed)
             _playerVelocity.OnJumpInputDown();
+    }
+    public void ReloadScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
