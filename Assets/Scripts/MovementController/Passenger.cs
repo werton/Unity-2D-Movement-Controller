@@ -37,7 +37,7 @@ namespace MovementController
 
         private void MoveTarget(Vector2 displacement)
         {
-            _movement.Move(displacement, Vector2.zero);
+            _movement.Move(displacement, DpadDirection.None);
         }
     }
 }

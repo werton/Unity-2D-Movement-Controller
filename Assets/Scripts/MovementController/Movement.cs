@@ -18,7 +18,7 @@ namespace MovementController
         private bool _descendSlope;
         private bool _passThroughPlatform;
         private bool _ascendSlope;
-        private Vector2 _objectInput;
+        private DpadDirection _objectInput;
         private RaycastHit2D[] _raycastHits = new RaycastHit2D[1];
 
 
@@ -40,7 +40,7 @@ namespace MovementController
         /// <summary>
         ///     Checks for collisions then applies correct transform translation to move object
         /// </summary>
-        public void Move(Vector2 offset, Vector2 input)
+        public void Move(Vector2 offset, DpadDirection input)
         {
             ResetDetection();
 
@@ -168,7 +168,7 @@ namespace MovementController
                         if (_passThroughPlatform)
                             continue;
                         
-                        if (_objectInput.y == -1)
+                        if (_objectInput.Y == -1)
                         {
                             _passThroughPlatform = true;
                             Invoke(nameof(ResetPassThroughPlatform), .5f);

@@ -12,40 +12,39 @@ namespace MovementController
     [RequireComponent(typeof(Movement))]
     public class PlayerVelocity : MonoBehaviour
     {
-        [Header("Movement settings")] [SerializeField]
-        private float _moveSpeed = 10;
+        [Header("Movement settings")]
+        [SerializeField] private float _moveSpeed = 10;
 
-        [Header("Jumping settings")] [SerializeField]
-        private float _maxJumpHeight = 3;
-
+        [Header("Jumping settings")]
+        [SerializeField] private float _maxJumpHeight = 3;
         [SerializeField] private float _minJumpHeight = 2;
         [SerializeField] private float _timeToJumpApex = .4f;
 
-        [Header("Falling settings")] [SerializeField]
-        private float _accelerationTimeAirborne = .2f;
-
+        [Header("Falling settings")]
+        [SerializeField] private float _accelerationTimeAirborne = .2f;
         [SerializeField] private float _accelerationTimeGrounded = .1f;
         [SerializeField] private float _forceFallSpeed = 20;
 
-        [Header("Wall jump settings")] [SerializeField]
-        private Vector2 _wallJump = new Vector2(15, 15);
-
+        [Header("Wall jump settings")]
+        [SerializeField] private Vector2 _wallJump = new Vector2(15, 15);
         [SerializeField] private Vector2 _wallJumpClimb = new Vector2(5, 15);
         [SerializeField] private Vector2 _wallLeapOff = new Vector2(15, 15);
 
-        [Header("Wall slide settings")] [SerializeField]
-        private float _wallSlideSpeedMax = 3;
-
-        [SerializeField] private float _wallStickTime = .25f;
+        [Header("Wall slide settings")]
+        [SerializeField] private float _wallSlideMaxSpeed = 3;
+        [SerializeField] private float _wallStickBeforeSlideDelay = .15f;
+        [SerializeField] private float _wallDropOnBackInputDelay = .25f;
 
         private Movement _playerMovement;
         private Vector3 _velocity;
         private Vector3 _oldVelocity;
-        private Vector2 _directionalInput;
+        // private Vector2 _directionalInput;
+        private DpadDirection _directionalInput;
         private float _gravity;
         private float _maxJumpVelocity;
         private float _minJumpVelocity;
-        private float _timeToWallUnstick;
+        private float _wallStickBeforeSlideTime;        
+        private float _wallDropOnBackInputTime;
         private float _velocityXSmoothing;
         private int _wallDirX;
         private bool _wallContact;
@@ -58,6 +57,8 @@ namespace MovementController
             _gravity = -(2 * _maxJumpHeight) / Mathf.Pow(_timeToJumpApex, 2);
             _maxJumpVelocity = Math.Abs(_gravity) * _timeToJumpApex;
             _minJumpVelocity = Mathf.Sqrt(2 * Math.Abs(_gravity) * _minJumpHeight);
+            _wallStickBeforeSlideTime = _wallStickBeforeSlideDelay;            
+            _wallDropOnBackInputTime = _wallDropOnBackInputDelay;
         }
 
         private void Update()
@@ -88,7 +89,7 @@ namespace MovementController
         private void CalculateVelocity()
         {
             // suvat; s = ut, note a=0
-            var targetVelocityX = _directionalInput.x * _moveSpeed;
+            var targetVelocityX = _directionalInput.X * _moveSpeed;
             _oldVelocity = _velocity;
             // ms when player is on the ground faster vs. in air
             var smoothTime = _playerMovement.CollisionDirection.below
@@ -101,6 +102,7 @@ namespace MovementController
         private void HandleWallSliding()
         {
             _wallDirX = _playerMovement.CollisionDirection.left ? -1 : 1;
+            
             var horizontalCollision =
                 _playerMovement.CollisionDirection.left || _playerMovement.CollisionDirection.right;
 
@@ -108,58 +110,59 @@ namespace MovementController
             if (horizontalCollision && !_playerMovement.CollisionDirection.below && !_playerMovement.ForceFall &&
                 _playerMovement.CollisionInfo.onWall)
             {
-                _wallContact = true;
+                if (_wallContact == false)
+                {
+                    _wallContact = true;
+                    _wallStickBeforeSlideTime = _wallStickBeforeSlideDelay;
+                }
 
                 // Check if falling down - only wall slide then
-                if (!(_velocity.y < 0))
+                if (_velocity.y >= 0)
                     return;
 
                 // Grab wall if input facing wall
-                if (_directionalInput.x == _wallDirX)
+                if (_directionalInput.X == _wallDirX || _wallStickBeforeSlideTime > 0)
                 {
                     _velocity.y = 0;
+                    _wallStickBeforeSlideTime -= Time.deltaTime;
                 }
                 else
                 {
                     // Only slow down if falling faster than slide speed
-                    if (_velocity.y < -_wallSlideSpeedMax)
-                    {
-                        _velocity.y = -_wallSlideSpeedMax;
-                    }
+                    if (_velocity.y < -_wallSlideMaxSpeed)
+                        _velocity.y = -_wallSlideMaxSpeed;
 
-                    // Stick to wall until timeToWallUnstick has counted down to 0 from wallStickTime
-                    if (_timeToWallUnstick > 0)
+                        // Stick to wall until timeToWallUnstick has counted down to 0 from wallStickTime
+                    if (_wallDropOnBackInputTime > 0)
                     {
                         _velocityXSmoothing = 0;
                         _velocity.x = 0;
 
-                        if (_directionalInput.x != _wallDirX && _directionalInput.x != 0)
-                            _timeToWallUnstick -= Time.deltaTime;
+                        if (_directionalInput.X == -_wallDirX)
+                            _wallDropOnBackInputTime -= Time.deltaTime;
                         else
-                            _timeToWallUnstick = _wallStickTime;
-                    }
-                    else
-                    {
-                        _timeToWallUnstick = _wallStickTime;
+                            _wallDropOnBackInputTime = _wallDropOnBackInputDelay;
                     }
                 }
             }
             else
             {
                 _wallContact = false;
+                _wallDropOnBackInputTime = _wallDropOnBackInputDelay;
             }
         }
 
         /* Public Functions used by PlayerInput script */
-
+        
         /// <summary>
         ///     Handle horizontal movement input
         /// </summary>
-        public void SetDirectionalInput(Vector2 input)
+        public void SetDirectionalInput(Vector2 direction)
         {
-            _directionalInput = input;
+            // _directionalInput = input;
+            _directionalInput.SetDirection(direction);
         }
-
+        
         /// <summary>
         ///     Handle jumps
         /// </summary>
@@ -168,13 +171,13 @@ namespace MovementController
             if (_wallContact)
             {
                 // Standard wall jump
-                if (_directionalInput.x == 0)
+                if (_directionalInput.X == 0)
                 {
                     _velocity.x = -_wallDirX * _wallJump.x;
                     _velocity.y = _wallJump.y;
                 }
                 // Climb up if input is facing wall
-                else if (_wallDirX == _directionalInput.x)
+                else if (_wallDirX == _directionalInput.X)
                 {
                     _velocity.x = -_wallDirX * _wallJumpClimb.x;
                     _velocity.y = _wallJumpClimb.y;
@@ -192,7 +195,7 @@ namespace MovementController
                 if (_playerMovement.SlidingDownMaxSlope)
                 {
                     // Jumping away from max slope dir
-                    if (_directionalInput.x != -Math.Sign(_playerMovement.CollisionInfo.slopeNormal.x))
+                    if (_directionalInput.X != -Math.Sign(_playerMovement.CollisionInfo.slopeNormal.x))
                     {
                         _velocity.y = _maxJumpVelocity * _playerMovement.CollisionInfo.slopeNormal.y;
                         _velocity.x = _maxJumpVelocity * _playerMovement.CollisionInfo.slopeNormal.x;
