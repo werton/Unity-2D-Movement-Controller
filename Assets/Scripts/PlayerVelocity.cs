@@ -55,10 +55,10 @@ public class PlayerVelocity : MonoBehaviour
 
     private void Update()
     {
-        _playerMovement.ResetCollisions();
-        
         CalculateVelocity();
         HandleWallSliding();
+        
+        _playerMovement.ResetCollisions();        
 
         // r = r0 + 1/2(v+v0)t, note Vector version used here
         // displacement = 1/2(v+v0)t since the playerMovementController uses Translate which moves from r0
