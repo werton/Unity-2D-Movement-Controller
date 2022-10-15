@@ -97,7 +97,7 @@ namespace MovementController
             var boxCastSize = new Vector2(SkinWidth, BoundsHeight - SkinWidth);
 
             var contactFilter2D = new ContactFilter2D();
-            contactFilter2D.SetLayerMask(CollisionMask);
+            contactFilter2D.SetLayerMask(HorizontalCollisionMask);
 
             int raycastHit2D = Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0,
                 Vector2.right * directionX, contactFilter2D, _raycastHits, rayLength + ShellRadius);
@@ -109,10 +109,7 @@ namespace MovementController
             {
                 if (hit == false)
                     return;
-
-                if (hit.collider.CompareTag("Through"))
-                    continue;
-
+                
                 var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
                 _collisionInfo.SetSlopeAngle(slopeAngle, hit.normal, WallAngle, WallTolerance);
 
@@ -155,7 +152,7 @@ namespace MovementController
                 Vector2 rayOrigin = directionY == -1 ? RaycastOrigins.bottomLeft : RaycastOrigins.topLeft;
                 // Note additional distance from movement in x dir needed to adjust rayOrigin correctly
                 rayOrigin += Vector2.right * (VerticalRaySpacing * i + displacement.x);
-                var hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, CollisionMask);
+                var hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, VerticalCollisionMask);
 
                 if (hit)
                 {
@@ -163,12 +160,14 @@ namespace MovementController
                     Debug.DrawRay(rayOrigin, Vector2.up * directionY, Color.green);
 
                     // Allow drop/jump through "Through" platforms
-                    if (hit.collider.CompareTag("Through"))
+                    if (hit.collider.TryGetComponent(out Platform platform))
                     {
                         if (directionY == 1 || hit.distance == 0)
                             continue;
+                        
                         if (_passThroughPlatform)
                             continue;
+                        
                         if (_objectInput.y == -1)
                         {
                             _passThroughPlatform = true;
@@ -232,9 +231,9 @@ namespace MovementController
         {
             // Check for max slope angle hits, XOR ensures only on side checked at a time
             var maxSlopeHitLeft = Physics2D.Raycast(RaycastOrigins.bottomLeft, Vector2.down,
-                Mathf.Abs(displacement.y) + SkinWidth, CollisionMask);
+                Mathf.Abs(displacement.y) + SkinWidth, VerticalCollisionMask);
             var maxSlopeHitRight = Physics2D.Raycast(RaycastOrigins.bottomRight, Vector2.down,
-                Mathf.Abs(displacement.y) + SkinWidth, CollisionMask);
+                Mathf.Abs(displacement.y) + SkinWidth, VerticalCollisionMask);
 
             if (maxSlopeHitLeft ^ maxSlopeHitRight)
             {
@@ -257,7 +256,7 @@ namespace MovementController
                 var directionX = Math.Sign(displacement.x);
                 var rayOrigin = directionX == -1 ? RaycastOrigins.bottomRight : RaycastOrigins.bottomLeft;
                 // Cast ray downwards infinitely to check for slope
-                var hit = Physics2D.Raycast(rayOrigin, -Vector2.up, Mathf.Infinity, CollisionMask);
+                var hit = Physics2D.Raycast(rayOrigin, -Vector2.up, Mathf.Infinity, VerticalCollisionMask);
 
                 if (hit)
                 {

@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 91723767}
   m_Layer: 9
   m_Name: MovingPlatform (1)
-  m_TagString: Through
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -266,7 +266,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CollisionMask>k__BackingField:
+  <HorizontalCollisionMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  <VerticalCollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -331,7 +334,7 @@ GameObject:
   - component: {fileID: 227026830}
   - component: {fileID: 227026829}
   - component: {fileID: 227026828}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (10)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -441,7 +444,7 @@ GameObject:
   - component: {fileID: 274977564}
   - component: {fileID: 274977563}
   - component: {fileID: 274977562}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -548,7 +551,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 283082953}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Quads
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -599,7 +602,7 @@ GameObject:
   - component: {fileID: 329857746}
   m_Layer: 10
   m_Name: Enemy (1)
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -719,7 +722,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CollisionMask>k__BackingField:
+  <HorizontalCollisionMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 520
+  <VerticalCollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 8
   <SkinWidth>k__BackingField: 0.02
@@ -737,7 +743,7 @@ GameObject:
   - component: {fileID: 385344278}
   - component: {fileID: 385344277}
   - component: {fileID: 385344276}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (12)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1034,7 +1040,7 @@ GameObject:
   - component: {fileID: 537726357}
   - component: {fileID: 537726356}
   - component: {fileID: 537726355}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1144,7 +1150,7 @@ GameObject:
   - component: {fileID: 635215475}
   - component: {fileID: 635215474}
   - component: {fileID: 635215473}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (9)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1257,7 +1263,7 @@ GameObject:
   - component: {fileID: 674953890}
   m_Layer: 9
   m_Name: Platform
-  m_TagString: Through
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1411,7 +1417,7 @@ GameObject:
   - component: {fileID: 772931285}
   - component: {fileID: 772931284}
   - component: {fileID: 772931283}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1526,7 +1532,7 @@ GameObject:
   - component: {fileID: 909861544}
   m_Layer: 10
   m_Name: Enemy
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1646,7 +1652,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CollisionMask>k__BackingField:
+  <HorizontalCollisionMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  <VerticalCollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -1664,7 +1673,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CollisionMask>k__BackingField:
+  <HorizontalCollisionMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  <VerticalCollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -1772,7 +1784,7 @@ GameObject:
   - component: {fileID: 1161132743}
   - component: {fileID: 1161132742}
   - component: {fileID: 1161132741}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1886,7 +1898,7 @@ GameObject:
   - component: {fileID: 1186770751}
   m_Layer: 11
   m_Name: Ally
-  m_TagString: Ally
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1903,7 +1915,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CollisionMask>k__BackingField:
+  <HorizontalCollisionMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  <VerticalCollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -2024,7 +2039,7 @@ GameObject:
   - component: {fileID: 1212974285}
   - component: {fileID: 1212974284}
   - component: {fileID: 1212974283}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (11)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2134,7 +2149,7 @@ GameObject:
   - component: {fileID: 1356032739}
   - component: {fileID: 1356032738}
   - component: {fileID: 1356032737}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2249,7 +2264,7 @@ GameObject:
   - component: {fileID: 1371044447}
   m_Layer: 8
   m_Name: Player
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2333,7 +2348,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CollisionMask>k__BackingField:
+  <HorizontalCollisionMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 1032
+  <VerticalCollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 1544
   <SkinWidth>k__BackingField: 0.02
@@ -2362,7 +2380,7 @@ MonoBehaviour:
   _wallJumpClimb: {x: 5, y: 15}
   _wallLeapOff: {x: 15, y: 15}
   _wallSlideSpeedMax: 3
-  _wallStickTime: 0.25
+  _wallStickTime: 1
 --- !u!114 &1371044445
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2425,7 +2443,7 @@ GameObject:
   - component: {fileID: 1471433995}
   - component: {fileID: 1471433994}
   - component: {fileID: 1471433993}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2539,7 +2557,7 @@ GameObject:
   - component: {fileID: 1506478939}
   m_Layer: 9
   m_Name: MovingPlatform (3)
-  m_TagString: Through
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2666,7 +2684,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CollisionMask>k__BackingField:
+  <HorizontalCollisionMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  <VerticalCollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -2690,7 +2711,7 @@ GameObject:
   - component: {fileID: 1544271634}
   m_Layer: 9
   m_Name: MovingPlatform (4)
-  m_TagString: Through
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2819,7 +2840,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CollisionMask>k__BackingField:
+  <HorizontalCollisionMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  <VerticalCollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -2839,7 +2863,7 @@ GameObject:
   - component: {fileID: 1642219838}
   - component: {fileID: 1642219837}
   - component: {fileID: 1642219836}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3024,7 +3048,7 @@ GameObject:
   - component: {fileID: 1691578946}
   m_Layer: 9
   m_Name: MovingPlatform (2)
-  m_TagString: Through
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3153,7 +3177,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CollisionMask>k__BackingField:
+  <HorizontalCollisionMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  <VerticalCollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -3173,7 +3200,7 @@ GameObject:
   - component: {fileID: 1822950374}
   - component: {fileID: 1822950373}
   - component: {fileID: 1822950372}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (8)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3283,7 +3310,7 @@ GameObject:
   - component: {fileID: 2057814951}
   - component: {fileID: 2057814950}
   - component: {fileID: 2057814949}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Quad (7)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

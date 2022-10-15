@@ -8,7 +8,8 @@ namespace MovementController
     [RequireComponent(typeof(BoxCollider2D))]
     public class BoxColliderCasts : MonoBehaviour
     {
-        [field: SerializeField] public LayerMask CollisionMask { get; private set; }
+        [field: SerializeField] public LayerMask HorizontalCollisionMask { get; private set; }
+        [field: SerializeField] public LayerMask VerticalCollisionMask { get; private set; }
         [field: SerializeField] public float SkinWidth { get; private set; } = .02f;
         [field: SerializeField] public float DistanceBetweenRays { get; private set; } = .2f;  
         
