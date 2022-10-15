@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PassengerMover : BoxColliderCasts
@@ -17,18 +18,18 @@ public class PassengerMover : BoxColliderCasts
         UpdateBoxCastOrigins();
     }
 
-    public void CalculatePassengerMovement(Vector3 displacement)
+    public void CalculatePassengerMovement(Vector3 offset)
     {
         var movedPassengers = new HashSet<Transform>();
         _passengerMovement = new List<PassengerMovement>();
 
-        var directionX = Mathf.Sign(displacement.x);
-        var directionY = Mathf.Sign(displacement.y);
+        var directionX = Math.Sign(offset.x);
+        var directionY = Math.Sign(offset.y);
 
         // Vertically moving platform
-        if (displacement.y != 0)
+        if (offset.y != 0)
         {
-            var rayLength = Mathf.Abs(displacement.y);
+            var rayLength = Mathf.Abs(offset.y);
 
             var boxRayOrigin = directionY == -1 ? BoxCastOrigins.bottomCenter : BoxCastOrigins.topCenter;
             var boxCastSize = new Vector2(BoundsWidth, SkinWidth);
@@ -46,8 +47,8 @@ public class PassengerMover : BoxColliderCasts
                     {
                         movedPassengers.Add(hit.transform);
 
-                        var pushX = directionY == 1 ? displacement.x : 0;
-                        var pushY = displacement.y - hit.distance * directionY;
+                        var pushX = directionY == 1 ? offset.x : 0;
+                        var pushY = offset.y - hit.distance * directionY;
 
                         _passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY),
                             directionY == 1, true));
@@ -56,9 +57,9 @@ public class PassengerMover : BoxColliderCasts
         }
 
         // Horizontally moving platform
-        if (displacement.x != 0)
+        if (offset.x != 0)
         {
-            var rayLength = Mathf.Abs(displacement.x);
+            var rayLength = Mathf.Abs(offset.x);
 
             var boxRayOrigin = directionX == -1 ? BoxCastOrigins.leftCenter : BoxCastOrigins.rightCenter;
             var boxCastSize = new Vector2(SkinWidth, BoundsHeight);
@@ -76,7 +77,7 @@ public class PassengerMover : BoxColliderCasts
                     {
                         movedPassengers.Add(hit.transform);
 
-                        var pushX = displacement.x - (hit.distance - SkinWidth) * directionX;
+                        var pushX = offset.x - (hit.distance - SkinWidth) * directionX;
                         var pushY = -SkinWidth;
 
                         _passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY), false,
@@ -86,7 +87,7 @@ public class PassengerMover : BoxColliderCasts
         }
 
         // Passenger on top of a horizontally or downward moving platform
-        if (directionY == -1 || (displacement.y == 0 && displacement.x != 0))
+        if (directionY == -1 || (offset.y == 0 && offset.x != 0))
         {
             var boxCastSize = new Vector2(BoundsWidth, SkinWidth);
             var contactFilter2D = new ContactFilter2D();
@@ -102,8 +103,8 @@ public class PassengerMover : BoxColliderCasts
                     if (!movedPassengers.Contains(hit.transform))
                     {
                         movedPassengers.Add(hit.transform);
-                        var pushX = displacement.x;
-                        var pushY = displacement.y;
+                        var pushX = offset.x;
+                        var pushY = offset.y;
 
                         _passengerMovement.Add(new PassengerMovement(hit.transform, new Vector3(pushX, pushY), true,
                             false));
@@ -131,13 +132,13 @@ public class PassengerMover : BoxColliderCasts
         public readonly bool standingOnPlatform;
         public readonly bool moveBeforePlatform;
 
-        public PassengerMovement(Transform _transform, Vector3 _displacement, bool _standingOnPlatform,
-            bool _moveBeforePlatform)
+        public PassengerMovement(Transform transform, Vector3 displacement, bool standingOnPlatform,
+            bool moveBeforePlatform)
         {
-            transform = _transform;
-            displacement = _displacement;
-            standingOnPlatform = _standingOnPlatform;
-            moveBeforePlatform = _moveBeforePlatform;
+            this.transform = transform;
+            this.displacement = displacement;
+            this.standingOnPlatform = standingOnPlatform;
+            this.moveBeforePlatform = moveBeforePlatform;
         }
     }
 }
