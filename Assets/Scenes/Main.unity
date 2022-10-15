@@ -2361,6 +2361,7 @@ MonoBehaviour:
   _wallJump: {x: 15, y: 15}
   _wallJumpClimb: {x: 5, y: 15}
   _wallLeapOff: {x: 15, y: 15}
+  _wallStickTolerance: 0.25
   _wallSlideSpeedMax: 3
   _wallStickTime: 0.25
 --- !u!114 &1371044445

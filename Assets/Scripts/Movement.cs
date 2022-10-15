@@ -90,7 +90,7 @@ public class Movement : BoxColliderCasts
         var rayLength = Math.Abs(offset.x) + SkinWidth * 2;
 
         var boxRayOrigin = directionX == -1 ? BoxCastOrigins.leftCenter : BoxCastOrigins.rightCenter;
-        boxRayOrigin -= Vector2.right * directionX * SkinWidth;
+        boxRayOrigin -= Vector2.right * (directionX * SkinWidth);
 
         var boxCastSize = new Vector2(SkinWidth, BoundsHeight - SkinWidth);
 
@@ -103,14 +103,12 @@ public class Movement : BoxColliderCasts
         if (raycastHit2D == 0)
             return;
         
-        for (var i = 0; i < _raycastHits.Length; i++)
+        foreach (var hit in _raycastHits)
         {
-            var hit = _raycastHits[i];
-            
             if (hit == false)
                 return;
             
-            if (hit.collider.tag == "Through")
+            if (hit.collider.CompareTag("Through"))
                 continue;
 
             var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
@@ -132,12 +130,11 @@ public class Movement : BoxColliderCasts
                 // Adjust y accordingly using tan(angle) = O/A, to prevent further ascend when wall hit
                 if (_ascendSlope)
                     offset.y = Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *
-                                     Mathf.Abs(offset.x);
+                               Mathf.Abs(offset.x);
 
                 _collisionDirection.left = directionX == -1;
                 _collisionDirection.right = directionX == 1;
             }
-            
         }
     }
 
@@ -164,7 +161,7 @@ public class Movement : BoxColliderCasts
                 Debug.DrawRay(rayOrigin, Vector2.up * directionY, Color.green);
 
                 // Allow drop/jump through "Through" platforms
-                if (hit.collider.tag == "Through")
+                if (hit.collider.CompareTag("Through"))
                 {
                     if (directionY == 1 || hit.distance == 0)
                         continue;
@@ -173,7 +170,7 @@ public class Movement : BoxColliderCasts
                     if (_objectInput.y == -1)
                     {
                         _passThroughPlatform = true;
-                        Invoke("ResetPassThroughPlatform", .5f);
+                        Invoke(nameof(ResetPassThroughPlatform), .5f);
                         continue;
                     }
                 }
@@ -209,16 +206,16 @@ public class Movement : BoxColliderCasts
     /// </summary>
     private void CheckSlopeAscent(ref Vector2 displacement, float slopeAngle)
     {
-        /// Use intended x dir speed for moveDistance (H) up slope 
+        // Use intended x dir speed for moveDistance (H) up slope 
         var moveDistance = Mathf.Abs(displacement.x);
-        /// Work out ascendDisplacementY (O) with Sin(angle)=O/H
+        // Work out ascendDisplacementY (O) with Sin(angle)=O/H
         var ascendDisplacementY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
 
         // Check if object is jumping already before ascend
         if (displacement.y <= ascendDisplacementY)
         {
             displacement.y = ascendDisplacementY;
-            /// Work out ascendDisplacementX (A) with Cos(angle)=A/H
+            // Work out ascendDisplacementX (A) with Cos(angle)=A/H
             displacement.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(displacement.x);
             _collisionDirection.below = true;
             _ascendSlope = true;
@@ -257,7 +254,7 @@ public class Movement : BoxColliderCasts
         {
             var directionX = Math.Sign(displacement.x);
             var rayOrigin = directionX == -1 ? RaycastOrigins.bottomRight : RaycastOrigins.bottomLeft;
-            // Cast ray downwards infinitly to check for slope
+            // Cast ray downwards infinitely to check for slope
             var hit = Physics2D.Raycast(rayOrigin, -Vector2.up, Mathf.Infinity, collisionMask);
 
             if (hit)
@@ -266,18 +263,18 @@ public class Movement : BoxColliderCasts
                 _collisionInfo.SetSlopeAngle(slopeAngle, hit.normal, WallAngle, WallTolerance);
 
                 var descendableSlope = slopeAngle != 0 && slopeAngle <= _maxSlopeAngle;
-                var moveInSlopeDirection = Mathf.Sign(hit.normal.x) == directionX;
+                var moveInSlopeDirection = Math.Sign(hit.normal.x) == directionX;
                 // Calculate accordingly using tan(angle) = O/A, to prevent further falling when slope hit
                 var fallingToSlope = hit.distance - SkinWidth <=
                                      Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(displacement.x);
 
                 if (descendableSlope && moveInSlopeDirection && fallingToSlope)
                 {
-                    /// Use intended x dir speed for moveDistance (H) down slope 
+                    // Use intended x dir speed for moveDistance (H) down slope 
                     var moveDistance = Mathf.Abs(displacement.x);
-                    /// Work out descendDisplacementY (O) with Sin(angle)=O/H
+                    // Work out descendDisplacementY (O) with Sin(angle)=O/H
                     var descendDisplacementY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
-                    /// Work out descendDisplacementX (A) with Cos(angle)=A/H
+                    // Work out descendDisplacementX (A) with Cos(angle)=A/H
                     displacement.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(displacement.x);
                     displacement.y -= descendDisplacementY;
 

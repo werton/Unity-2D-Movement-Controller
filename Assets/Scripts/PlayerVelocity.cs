@@ -62,19 +62,19 @@ public class PlayerVelocity : MonoBehaviour
 
         // r = r0 + 1/2(v+v0)t, note Vector version used here
         // displacement = 1/2(v+v0)t since the playerMovementController uses Translate which moves from r0
-        var offset = (_velocity + _oldVelocity) * 0.5f * Time.deltaTime;
+        var offset = (_velocity + _oldVelocity) * (0.5f * Time.deltaTime);
         // Move player using movement controller which checks for collisions then applies correct transform (displacement) translation
         _playerMovement.Move(offset, _directionalInput);
 
         var verticalCollision = _playerMovement.CollisionDirection.above || _playerMovement.CollisionDirection.below;
 
-        if (verticalCollision)
-        {
-            if (_playerMovement.SlidingDownMaxSlope)
-                _velocity.y += _playerMovement.CollisionInfo.slopeNormal.y * -_gravity * Time.deltaTime;
-            else
-                _velocity.y = 0;
-        }
+        if (!verticalCollision)
+            return;
+        
+        if (_playerMovement.SlidingDownMaxSlope)
+            _velocity.y += _playerMovement.CollisionInfo.slopeNormal.y * -_gravity * Time.deltaTime;
+        else
+            _velocity.y = 0;
     }
 
     private void CalculateVelocity()
@@ -100,36 +100,36 @@ public class PlayerVelocity : MonoBehaviour
             _wallContact = true;
 
             // Check if falling down - only wall slide then
-            if (_velocity.y < 0)
+            if (!(_velocity.y < 0))
+                return;
+            
+            // Grab wall if input facing wall
+            if (_directionalInput.x == _wallDirX)
             {
-                // Grab wall if input facing wall
-                if (_directionalInput.x == _wallDirX)
+                _velocity.y = 0;
+            }
+            else
+            {
+                // Only slow down if falling faster than slide speed
+                if (_velocity.y < -_wallSlideSpeedMax)
                 {
-                    _velocity.y = 0;
+                    _velocity.y = -_wallSlideSpeedMax;
+                }
+
+                // Stick to wall until timeToWallUnstick has counted down to 0 from wallStickTime
+                if (_timeToWallUnstick > 0)
+                {
+                    _velocityXSmoothing = 0;
+                    _velocity.x = 0;
+
+                    if (_directionalInput.x != _wallDirX && _directionalInput.x != 0)
+                        _timeToWallUnstick -= Time.deltaTime;
+                    else
+                        _timeToWallUnstick = _wallStickTime;
                 }
                 else
                 {
-                    // Only slow down if falling faster than slide speed
-                    if (_velocity.y < -_wallSlideSpeedMax)
-                    {
-                        _velocity.y = -_wallSlideSpeedMax;
-                    }
-
-                    // Stick to wall until timeToWallUnstick has counted down to 0 from wallStickTime
-                    if (_timeToWallUnstick > 0)
-                    {
-                        _velocityXSmoothing = 0;
-                        _velocity.x = 0;
-
-                        if (_directionalInput.x != _wallDirX && _directionalInput.x != 0)
-                            _timeToWallUnstick -= Time.deltaTime;
-                        else
-                            _timeToWallUnstick = _wallStickTime;
-                    }
-                    else
-                    {
-                        _timeToWallUnstick = _wallStickTime;
-                    }
+                    _timeToWallUnstick = _wallStickTime;
                 }
             }
         }
