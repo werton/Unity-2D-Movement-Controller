@@ -6,7 +6,7 @@ public class Movement : BoxColliderCasts
 {
     private const float WallAngle = 90;
     private const float WallTolerance = 1;
-    private const float ShellRadius = .03f;
+    private const float ShellRadius = .01f;
     
     [SerializeField] [Range(0f, WallAngle - WallTolerance)] private float _maxSlopeAngle = 60;
     
