@@ -54,8 +54,7 @@ public class Movement : BoxColliderCasts
         }     
         
         TryMoveHorizontally(ref offset, _faceDirection);
-
-
+        
         if (offset.y != 0)
             TryMoveVertically(ref offset);
 
@@ -64,8 +63,6 @@ public class Movement : BoxColliderCasts
         // Reset grounded variables
         if (_collisionDirection.below)
             ForceFall = false;
-        
-        
     }
 
     private void ResetDetection()
