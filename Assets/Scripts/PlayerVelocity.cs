@@ -1,5 +1,5 @@
 ﻿/*
- * Script gets player's intended velocity & displacement (caused by enviroment variables + user input which is taken from PlayerInput)
+ * Script gets player's intended velocity & displacement (caused by environment variables + user input which is taken from PlayerInput)
  * See for equations/physics: https://en.wikipedia.org/wiki/Equations_of_motion
  * See: http://lolengine.net/blog/2011/12/14/understanding-motion-in-games for Verlet integration vs. Euler
  */
