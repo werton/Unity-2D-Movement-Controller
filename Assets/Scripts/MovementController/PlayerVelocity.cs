@@ -4,6 +4,7 @@
  * See: http://lolengine.net/blog/2011/12/14/understanding-motion-in-games for Verlet integration vs. Euler
  */
 
+using System;
 using UnityEngine;
 
 namespace MovementController
@@ -55,8 +56,8 @@ namespace MovementController
 
             // see suvat calculations; s = ut + 1/2at^2, v^2 = u^2 + 2at, where u=0, scalar looking at only y dir
             _gravity = -(2 * _maxJumpHeight) / Mathf.Pow(_timeToJumpApex, 2);
-            _maxJumpVelocity = Mathf.Abs(_gravity) * _timeToJumpApex;
-            _minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(_gravity) * _minJumpHeight);
+            _maxJumpVelocity = Math.Abs(_gravity) * _timeToJumpApex;
+            _minJumpVelocity = Mathf.Sqrt(2 * Math.Abs(_gravity) * _minJumpHeight);
         }
 
         private void Update()
@@ -191,7 +192,7 @@ namespace MovementController
                 if (_playerMovement.SlidingDownMaxSlope)
                 {
                     // Jumping away from max slope dir
-                    if (_directionalInput.x != -Mathf.Sign(_playerMovement.CollisionInfo.slopeNormal.x))
+                    if (_directionalInput.x != -Math.Sign(_playerMovement.CollisionInfo.slopeNormal.x))
                     {
                         _velocity.y = _maxJumpVelocity * _playerMovement.CollisionInfo.slopeNormal.y;
                         _velocity.x = _maxJumpVelocity * _playerMovement.CollisionInfo.slopeNormal.x;

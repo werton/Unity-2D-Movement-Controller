@@ -129,7 +129,7 @@ namespace MovementController
                     // Adjust y accordingly using tan(angle) = O/A, to prevent further ascend when wall hit
                     if (_ascendSlope)
                         offset.y = Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *
-                                   Mathf.Abs(offset.x);
+                                   Math.Abs(offset.x);
 
                     _collisionDirection.left = directionX == -1;
                     _collisionDirection.right = directionX == 1;
@@ -184,7 +184,7 @@ namespace MovementController
                     // Adjust x accordingly using tan(angle) = O/A, to prevent further ascend when ceiling hit
                     if (_ascendSlope)
                         displacement.x = displacement.y / Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *
-                                         Mathf.Sign(displacement.x);
+                                         Math.Sign(displacement.x);
 
                     _collisionDirection.below = directionY == -1;
                     _collisionDirection.above = directionY == 1;
@@ -208,7 +208,7 @@ namespace MovementController
         private void CheckSlopeAscent(ref Vector2 displacement, float slopeAngle)
         {
             // Use intended x dir speed for moveDistance (H) up slope 
-            var moveDistance = Mathf.Abs(displacement.x);
+            var moveDistance = Math.Abs(displacement.x);
             // Work out ascendDisplacementY (O) with Sin(angle)=O/H
             var ascendDisplacementY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
 
@@ -231,9 +231,9 @@ namespace MovementController
         {
             // Check for max slope angle hits, XOR ensures only on side checked at a time
             var maxSlopeHitLeft = Physics2D.Raycast(RaycastOrigins.bottomLeft, Vector2.down,
-                Mathf.Abs(displacement.y) + SkinWidth, VerticalCollisionMask);
+                Math.Abs(displacement.y) + SkinWidth, VerticalCollisionMask);
             var maxSlopeHitRight = Physics2D.Raycast(RaycastOrigins.bottomRight, Vector2.down,
-                Mathf.Abs(displacement.y) + SkinWidth, VerticalCollisionMask);
+                Math.Abs(displacement.y) + SkinWidth, VerticalCollisionMask);
 
             if (maxSlopeHitLeft ^ maxSlopeHitRight)
             {
@@ -272,12 +272,12 @@ namespace MovementController
                     if (descendableSlope && moveInSlopeDirection && fallingToSlope)
                     {
                         // Use intended x dir speed for moveDistance (H) down slope 
-                        var moveDistance = Mathf.Abs(displacement.x);
+                        var moveDistance = Math.Abs(displacement.x);
                         // Work out descendDisplacementY (O) with Sin(angle)=O/H
                         var descendDisplacementY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
                         // Work out descendDisplacementX (A) with Cos(angle)=A/H
                         displacement.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance *
-                                         Mathf.Sign(displacement.x);
+                                         Math.Sign(displacement.x);
                         displacement.y -= descendDisplacementY;
 
                         _descendSlope = true;
@@ -297,7 +297,7 @@ namespace MovementController
             if (slopeAngle > _maxSlopeAngle && slopeAngle < WallAngle - WallTolerance)
             {
                 // Calculate accordingly using tan(angle) = O / A, to slide on slope, where x (A), where y (O)
-                displacement.x = Mathf.Sign(hit.normal.x) * (Mathf.Abs(displacement.y) - hit.distance) /
+                displacement.x = Math.Sign(hit.normal.x) * (Math.Abs(displacement.y) - hit.distance) /
                                  Mathf.Tan(slopeAngle * Mathf.Deg2Rad);
                 SlidingDownMaxSlope = true;
             }
