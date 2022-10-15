@@ -266,7 +266,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
+  <CollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -719,9 +719,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
+  <CollisionMask>k__BackingField:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 8
   <SkinWidth>k__BackingField: 0.02
   <DistanceBetweenRays>k__BackingField: 0.2
   _maxSlopeAngle: 60
@@ -1646,7 +1646,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
+  <CollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -1664,7 +1664,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
+  <CollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -1903,7 +1903,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
+  <CollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -2333,9 +2333,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3226708d3c453dc409ffbed4bbff1013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
+  <CollisionMask>k__BackingField:
     serializedVersion: 2
-    m_Bits: 1536
+    m_Bits: 1544
   <SkinWidth>k__BackingField: 0.02
   <DistanceBetweenRays>k__BackingField: 0.2
   _maxSlopeAngle: 60
@@ -2361,7 +2361,6 @@ MonoBehaviour:
   _wallJump: {x: 15, y: 15}
   _wallJumpClimb: {x: 5, y: 15}
   _wallLeapOff: {x: 15, y: 15}
-  _wallStickTolerance: 0.25
   _wallSlideSpeedMax: 3
   _wallStickTime: 0.25
 --- !u!114 &1371044445
@@ -2667,7 +2666,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
+  <CollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -2820,7 +2819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
+  <CollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -3154,7 +3153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d232c8155c3ab6a4fbd7088af4cdd349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionMask:
+  <CollisionMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
   <SkinWidth>k__BackingField: 0.02
@@ -3396,7 +3395,7 @@ GameObject:
   - component: {fileID: 2088707785}
   - component: {fileID: 2088707784}
   - component: {fileID: 2088707783}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Platforms
   m_TagString: Untagged
   m_Icon: {fileID: 0}
