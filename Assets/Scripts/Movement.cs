@@ -64,18 +64,25 @@ public class Movement : BoxColliderCasts
         // Reset grounded variables
         if (_collisionDirection.below)
             ForceFall = false;
+        
+        
     }
 
     private void ResetDetection()
     {
         UpdateRaycastOrigins();
         UpdateBoxCastOrigins();
-        _collisionDirection.Reset();
+        // _collisionDirection.Reset();
         _collisionInfo.Reset();
         _ascendSlope = false;
         _descendSlope = false;
         SlidingDownMaxSlope = false;
     }
+    
+    public void ResetCollisions()
+    {
+        _collisionDirection.Reset();
+    }  
 
     /// <summary>
     ///     Check horizontal collisions using box cast (more smooth than ray cast), if angle hit found check for ascent

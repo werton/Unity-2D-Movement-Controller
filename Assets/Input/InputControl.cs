@@ -51,7 +51,7 @@ public partial class @InputControl : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""3d78539e-7ab2-4073-a166-613f2b7ff518"",
                     ""path"": ""<Keyboard>/numpad3"",
-                    ""interactions"": """",
+                    ""interactions"": ""Press(behavior=2)"",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
                     ""action"": ""Jump"",

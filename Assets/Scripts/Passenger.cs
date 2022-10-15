@@ -8,21 +8,21 @@ public class Passenger : MonoBehaviour
     /// <summary>
     ///     Move passenger by given displacement
     /// </summary>
-    public void Move(Vector2 displacement, bool standingOnPlatform)
+    public void Move(Vector2 offset, bool standingOnPlatform)
     {
         var passengerMover = gameObject.GetComponent<PassengerMover>();
 
         if (passengerMover)
         {
-            passengerMover.CalculatePassengerMovement(displacement);
+            passengerMover.CalculatePassengerMovement(offset);
 
             passengerMover.MovePassengers(true);
-            MoveTarget(displacement);
+            MoveTarget(offset);
             passengerMover.MovePassengers(false);
         }
         else
         {
-            MoveTarget(displacement);
+            MoveTarget(offset);
         }
     }
 

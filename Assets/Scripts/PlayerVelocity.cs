@@ -55,6 +55,8 @@ public class PlayerVelocity : MonoBehaviour
 
     private void Update()
     {
+        _playerMovement.ResetCollisions();
+        
         CalculateVelocity();
         HandleWallSliding();
 
@@ -174,19 +176,24 @@ public class PlayerVelocity : MonoBehaviour
             }
         }
 
+        print("0");
         if (_playerMovement.CollisionDirection.below)
         {
+            print("1");
             if (_playerMovement.SlidingDownMaxSlope)
             {
+                print("2");
                 // Jumping away from max slope dir
                 if (_directionalInput.x != -Mathf.Sign(_playerMovement.CollisionInfo.slopeNormal.x))
                 {
+                    print("3");
                     _velocity.y = _maxJumpVelocity * _playerMovement.CollisionInfo.slopeNormal.y;
                     _velocity.x = _maxJumpVelocity * _playerMovement.CollisionInfo.slopeNormal.x;
                 }
             }
             else
             {
+                print("-1");
                 _velocity.y = _maxJumpVelocity;
             }
         }
