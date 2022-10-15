@@ -30,98 +30,69 @@ namespace MovementController
 
             // Vertically moving platform
             if (offset.y != 0)
-            {
-                float rayLength = Math.Abs(offset.y);
-
-                Vector2 boxRayOrigin = directionY == -1 ? BoxCastOrigins.bottomCenter : BoxCastOrigins.topCenter;
-                Vector2 boxCastSize = new Vector2(BoundsWidth, SkinWidth);
-                ContactFilter2D contactFilter2D = new ContactFilter2D();
-                contactFilter2D.SetLayerMask(_passengerMask);
-                var results = new List<RaycastHit2D>();
-
-                Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0, Vector2.up * directionY, contactFilter2D, results,
-                    rayLength);
-
-                results.ForEach(delegate(RaycastHit2D hit)
-                {
-                    if (!hit)
-                        return;
-
-                    if (movedPassengers.Contains(hit.transform))
-                        return;
-                    
-                    movedPassengers.Add(hit.transform);
-
-                    float pushX = directionY == 1 ? offset.x : 0;
-                    float pushY = offset.y - hit.distance * directionY;
-
-                    _passengerInfo.Add(new PassengerInfo(hit.transform, new Vector3(pushX, pushY),
-                        directionY == 1, true));
-                });
-            }
+                Move(offset.y, offset.x, directionY,  BoxCastOrigins.bottomCenter, BoxCastOrigins.topCenter,
+                    new Vector2(BoundsWidth, SkinWidth), Vector2.up, Math.Abs(offset.y), movedPassengers);
 
             // Horizontally moving platform
             if (offset.x != 0)
-            {
-                float rayLength = Math.Abs(offset.x);
-
-                Vector2 boxRayOrigin = directionX == -1 ? BoxCastOrigins.leftCenter : BoxCastOrigins.rightCenter;
-                Vector2 boxCastSize = new Vector2(SkinWidth, BoundsHeight);
-                ContactFilter2D contactFilter2D = new ContactFilter2D();
-                contactFilter2D.SetLayerMask(_passengerMask);
-                var results = new List<RaycastHit2D>();
-
-                Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0, Vector2.right * directionX, contactFilter2D, results,
-                    rayLength);
-
-                results.ForEach(delegate(RaycastHit2D hit)
-                {
-                    if (!hit)
-                        return;
-
-                    if (movedPassengers.Contains(hit.transform))
-                        return;
-                    
-                    movedPassengers.Add(hit.transform);
-
-                    float pushX = offset.x - (hit.distance - SkinWidth) * directionX;
-                    float pushY = -SkinWidth;
-
-                    _passengerInfo.Add(new PassengerInfo(hit.transform, new Vector3(pushX, pushY),
-                        false,
-                        true));
-                });
-            }
+                Move(offset.x, offset.y, directionX,  BoxCastOrigins.leftCenter, BoxCastOrigins.rightCenter,
+                    new Vector2(SkinWidth, BoundsHeight), Vector2.right, Math.Abs(offset.x), movedPassengers);
 
             // Passenger on top of a horizontally or downward moving platform
             if (directionY == -1 || (offset.y == 0 && offset.x != 0))
-            {
-                Vector2 boxCastSize = new Vector2(BoundsWidth, SkinWidth);
-                ContactFilter2D contactFilter2D = new ContactFilter2D();
-                contactFilter2D.SetLayerMask(_passengerMask);
-                var results = new List<RaycastHit2D>();
+                Move(offset.y, offset.x, directionY,  BoxCastOrigins.topCenter, BoxCastOrigins.topCenter,
+                new Vector2(BoundsWidth, SkinWidth), Vector2.up, SkinWidth, movedPassengers);
 
-                Physics2D.BoxCast(BoxCastOrigins.topCenter, boxCastSize, 0, Vector2.up, contactFilter2D, results,
-                    SkinWidth);
-
-                results.ForEach(delegate(RaycastHit2D hit)
-                {
-                    if (!hit)
-                        return;
-
-                    if (movedPassengers.Contains(hit.transform))
-                        return;
-                    
-                    movedPassengers.Add(hit.transform);
-                    
-                    float pushX = offset.x;
-                    float pushY = offset.y;
-
-                    _passengerInfo.Add(new PassengerInfo(hit.transform, new Vector3(pushX, pushY), true,
-                        false));
-                });
-            }
         }
+        
+        private void Move(float offset1, float offset2, int direction, Vector2 negativeOrigin, Vector2 positiveOrigin, 
+            Vector2 boxCastSize, Vector2 castDirection, float rayLength, HashSet<Transform> movedPassengers)
+        {
+            Vector2 boxRayOrigin = direction == -1 ? negativeOrigin : positiveOrigin;
+            ContactFilter2D contactFilter2D = new ContactFilter2D();
+            contactFilter2D.SetLayerMask(_passengerMask);
+            var results = new List<RaycastHit2D>();
+
+            Physics2D.BoxCast(boxRayOrigin, boxCastSize, 0, castDirection * direction, contactFilter2D, results,
+                rayLength);
+
+            results.ForEach(delegate(RaycastHit2D hit)
+            {
+                if (!hit)
+                    return;
+
+                if (movedPassengers.Contains(hit.transform))
+                    return;
+                    
+                movedPassengers.Add(hit.transform);
+
+                float pushX = 0;
+                float pushY = 0;
+
+                if (castDirection == Vector2.up)
+                {
+                    if(negativeOrigin == BoxCastOrigins.bottomCenter)
+                    {
+                        pushX = direction == 1 ? offset2 : 0;
+                        pushY = offset1 - hit.distance * direction;
+                    }
+                    else if(negativeOrigin == BoxCastOrigins.topCenter)
+                    {
+                        pushX = offset2;
+                        pushY = offset1;
+                    }   
+                }
+                else if(castDirection == Vector2.right)
+                {
+                    pushX = offset1 - (hit.distance - SkinWidth) * direction;
+                    pushY = -SkinWidth;                    
+                }
+             
+                _passengerInfo.Add(new PassengerInfo(hit.transform, new Vector3(pushX, pushY),
+                    true,
+                    true));
+            });
+        }        
 
         public void MovePassengers(bool beforeMovePlatform)
         {
