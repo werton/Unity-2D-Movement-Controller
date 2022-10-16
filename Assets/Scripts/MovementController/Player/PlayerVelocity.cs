@@ -28,6 +28,9 @@ namespace MovementController
         [Header("Wall stick settings")]
         [SerializeField] private bool _stickToWallEdges = false;
         [SerializeField] private float _wallEdgeDetectRayWidth = .1f;
+        [SerializeField] private bool _canClimbWhenNearTop = true;
+        [SerializeField] private float _wallTopDetectRayWidth = .15f;        
+        [SerializeField] private Vector2 _wallAtTopJumpVelocity = new Vector2(3, 12);        
         
         [Header("Wall jump settings")]
         [SerializeField] private Vector2 _wallJump = new Vector2(15, 15);
@@ -105,29 +108,51 @@ namespace MovementController
 
         private void HandleWallSliding()
         {
+            bool isClimbing = false;
             _wallDirX = _movement.CollisionDirection.left ? -1 : 1;
             
             var horizontalCollision =
                 _movement.CollisionDirection.left || _movement.CollisionDirection.right;
 
-            float rayWidth = _movement.BoundsWidth / 2 + _wallEdgeDetectRayWidth;
-            
+            float topRayWidth = _movement.BoundsWidth / 2 + _wallTopDetectRayWidth;
+            float bottomRayWidth = _movement.BoundsWidth / 2 + _wallEdgeDetectRayWidth;
+
+            Debug.DrawRay(_movement.BoxCastOrigins.topCenter,
+                topRayWidth * _wallDirX * Vector2.right, Color.red);  
+             
             Debug.DrawRay(_movement.BoxCastOrigins.bottomCenter,
-                rayWidth * _wallDirX * Vector2.right, Color.red);
+                bottomRayWidth * _wallDirX * Vector2.right, Color.red);
+            
             
             if (horizontalCollision && !_movement.CollisionDirection.below && !_movement.ForceFall &&
                 _movement.CollisionInfo.onWall)
             {
-                if (_stickToWallEdges == false)
+            
+                if (_canClimbWhenNearTop == true)
+                {
+                    var hit = Physics2D.Raycast(_movement.BoxCastOrigins.topCenter,
+                        _wallDirX * Vector2.right, topRayWidth,
+                        _movement.VerticalCollisionMask);
+
+                    if (!hit && _directionalInput.X == _wallDirX)
+                    {
+                        JumpAtTop();
+                        isClimbing = true;
+                    }
+                }          
+                
+                if (_stickToWallEdges == false && isClimbing == false)
                 {
                     var hit = Physics2D.Raycast(_movement.BoxCastOrigins.bottomCenter,
-                        _wallDirX * Vector2.right, rayWidth,
+                        _wallDirX * Vector2.right, bottomRayWidth,
                         _movement.VerticalCollisionMask);
 
                     if (!hit)
                         return;
                 }
-
+                
+              
+                
                 if (_wallContact == false)
                 {
                     _wallContact = true;
@@ -184,7 +209,7 @@ namespace MovementController
         /// <summary>
         ///     Handle jumps
         /// </summary>
-        public void OnJumpInputDown()
+        public void JumpStart()
         {
             if (_wallContact)
             {
@@ -225,11 +250,22 @@ namespace MovementController
                 }
             }
         }
-
+        
+        public void JumpAtTop()
+        {
+            // Climb up if input is facing wall
+            if (_wallDirX == _directionalInput.X)
+            {
+                // _velocity.x = -_wallDirX * _wallJumpClimb.x/2;
+                _velocity.x = -_wallDirX * _wallAtTopJumpVelocity.x;
+                _velocity.y = _wallAtTopJumpVelocity.y;
+            }
+        }
+        
         /// <summary>
         ///     Handle not fully commited jumps - allow for mini jumps
         /// </summary>
-        public void OnJumpInputUp()
+        public void JumpStop()
         {
             if (_velocity.y > _minJumpVelocity)
                 _velocity.y = _minJumpVelocity;
@@ -238,13 +274,13 @@ namespace MovementController
         /// <summary>
         ///     Handle down direction - force fall
         /// </summary>
-        public void OnFallInputDown()
+        public void FallDown()
         {
-            if (!_movement.CollisionDirection.below)
-            {
-                _velocity.y = -_forceFallSpeed;
-                _movement.SetForceFall();
-            }
+            if (_movement.CollisionDirection.below)
+                return;
+            
+            _velocity.y = -_forceFallSpeed;
+            _movement.SetForceFall();
         }
     }
 }

@@ -50,22 +50,22 @@ namespace MovementController
 
             if (horizontalDirection.y > 0)
                 if (context.started)
-                    _playerVelocity.OnJumpInputDown();
+                    _playerVelocity.JumpStart();
 
             if (context.canceled)
-                _playerVelocity.OnJumpInputUp();
+                _playerVelocity.JumpStop();
 
             if (horizontalDirection.y < 0)
-                _playerVelocity.OnFallInputDown();
+                _playerVelocity.FallDown();
         }
 
         private void OnKeyJump(InputAction.CallbackContext context)
         {
             if (context.started)
-                _playerVelocity.OnJumpInputDown();
+                _playerVelocity.JumpStart();
 
             if (context.canceled)
-                _playerVelocity.OnJumpInputUp();
+                _playerVelocity.JumpStop();
         }
 
         private void ReloadScene(InputAction.CallbackContext context)
