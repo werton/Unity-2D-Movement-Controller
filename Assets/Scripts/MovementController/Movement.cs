@@ -124,8 +124,11 @@ namespace MovementController
                 if (!_ascendSlope || slopeAngle > _maxSlopeAngle)
                 {
                     // Set displacement be at hit
-                    offset.x = (hit.distance - ShellRadius) * directionX;
-
+                    if (slopeAngle < WallAngle)
+                        offset.x = hit.distance * directionX;
+                    else
+                        offset.x = (hit.distance - ShellRadius) * directionX;
+                    
                     // Adjust y accordingly using tan(angle) = O/A, to prevent further ascend when wall hit
                     if (_ascendSlope)
                         offset.y = Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *

@@ -25,6 +25,10 @@ namespace MovementController
         [SerializeField] private float _accelerationTimeGrounded = .1f;
         [SerializeField] private float _forceFallSpeed = 20;
 
+        [Header("Wall stick settings")]
+        [SerializeField] private bool _stickToWallEdges = false;
+        [SerializeField] private float _wallEdgeDetectRayWidth = .1f;
+        
         [Header("Wall jump settings")]
         [SerializeField] private Vector2 _wallJump = new Vector2(15, 15);
         [SerializeField] private Vector2 _wallJumpClimb = new Vector2(5, 15);
@@ -35,7 +39,7 @@ namespace MovementController
         [SerializeField] private float _wallStickBeforeSlideDelay = .15f;
         [SerializeField] private float _wallDropOnBackInputDelay = .25f;
 
-        private Movement _playerMovement;
+        private Movement _movement;
         private Vector3 _velocity;
         private Vector3 _oldVelocity;
         // private Vector2 _directionalInput;
@@ -51,7 +55,7 @@ namespace MovementController
 
         private void Start()
         {
-            _playerMovement = GetComponent<Movement>();
+            _movement = GetComponent<Movement>();
 
             // see suvat calculations; s = ut + 1/2at^2, v^2 = u^2 + 2at, where u=0, scalar looking at only y dir
             _gravity = -(2 * _maxJumpHeight) / Mathf.Pow(_timeToJumpApex, 2);
@@ -66,22 +70,22 @@ namespace MovementController
             CalculateVelocity();
             HandleWallSliding();
 
-            _playerMovement.ResetCollisions();
+            _movement.ResetCollisions();
 
             // r = r0 + 1/2(v+v0)t, note Vector version used here
             // displacement = 1/2(v+v0)t since the playerMovementController uses Translate which moves from r0
             var offset = (_velocity + _oldVelocity) * (0.5f * Time.deltaTime);
             // Move player using movement controller which checks for collisions then applies correct transform (displacement) translation
-            _playerMovement.Move(offset, _directionalInput);
+            _movement.Move(offset, _directionalInput);
 
             var verticalCollision =
-                _playerMovement.CollisionDirection.above || _playerMovement.CollisionDirection.below;
+                _movement.CollisionDirection.above || _movement.CollisionDirection.below;
 
             if (!verticalCollision)
                 return;
 
-            if (_playerMovement.SlidingDownMaxSlope)
-                _velocity.y += _playerMovement.CollisionInfo.slopeNormal.y * -_gravity * Time.deltaTime;
+            if (_movement.SlidingDownMaxSlope)
+                _velocity.y += _movement.CollisionInfo.slopeNormal.y * -_gravity * Time.deltaTime;
             else
                 _velocity.y = 0;
         }
@@ -92,7 +96,7 @@ namespace MovementController
             var targetVelocityX = _directionalInput.X * _moveSpeed;
             _oldVelocity = _velocity;
             // ms when player is on the ground faster vs. in air
-            var smoothTime = _playerMovement.CollisionDirection.below
+            var smoothTime = _movement.CollisionDirection.below
                 ? _accelerationTimeGrounded
                 : _accelerationTimeAirborne;
             _velocity.x = Mathf.SmoothDamp(_velocity.x, targetVelocityX, ref _velocityXSmoothing, smoothTime);
@@ -101,15 +105,29 @@ namespace MovementController
 
         private void HandleWallSliding()
         {
-            _wallDirX = _playerMovement.CollisionDirection.left ? -1 : 1;
+            _wallDirX = _movement.CollisionDirection.left ? -1 : 1;
             
             var horizontalCollision =
-                _playerMovement.CollisionDirection.left || _playerMovement.CollisionDirection.right;
+                _movement.CollisionDirection.left || _movement.CollisionDirection.right;
 
-
-            if (horizontalCollision && !_playerMovement.CollisionDirection.below && !_playerMovement.ForceFall &&
-                _playerMovement.CollisionInfo.onWall)
+            float rayWidth = _movement.BoundsWidth / 2 + _wallEdgeDetectRayWidth;
+            
+            Debug.DrawRay(_movement.BoxCastOrigins.bottomCenter,
+                rayWidth * _wallDirX * Vector2.right, Color.red);
+            
+            if (horizontalCollision && !_movement.CollisionDirection.below && !_movement.ForceFall &&
+                _movement.CollisionInfo.onWall)
             {
+                if (_stickToWallEdges == false)
+                {
+                    var hit = Physics2D.Raycast(_movement.BoxCastOrigins.bottomCenter,
+                        _wallDirX * Vector2.right, rayWidth,
+                        _movement.VerticalCollisionMask);
+
+                    if (!hit)
+                        return;
+                }
+
                 if (_wallContact == false)
                 {
                     _wallContact = true;
@@ -190,15 +208,15 @@ namespace MovementController
                 }
             }
 
-            if (_playerMovement.CollisionDirection.below)
+            if (_movement.CollisionDirection.below)
             {
-                if (_playerMovement.SlidingDownMaxSlope)
+                if (_movement.SlidingDownMaxSlope)
                 {
                     // Jumping away from max slope dir
-                    if (_directionalInput.X != -Math.Sign(_playerMovement.CollisionInfo.slopeNormal.x))
+                    if (_directionalInput.X != -Math.Sign(_movement.CollisionInfo.slopeNormal.x))
                     {
-                        _velocity.y = _maxJumpVelocity * _playerMovement.CollisionInfo.slopeNormal.y;
-                        _velocity.x = _maxJumpVelocity * _playerMovement.CollisionInfo.slopeNormal.x;
+                        _velocity.y = _maxJumpVelocity * _movement.CollisionInfo.slopeNormal.y;
+                        _velocity.x = _maxJumpVelocity * _movement.CollisionInfo.slopeNormal.x;
                     }
                 }
                 else
@@ -222,10 +240,10 @@ namespace MovementController
         /// </summary>
         public void OnFallInputDown()
         {
-            if (!_playerMovement.CollisionDirection.below)
+            if (!_movement.CollisionDirection.below)
             {
                 _velocity.y = -_forceFallSpeed;
-                _playerMovement.SetForceFall();
+                _movement.SetForceFall();
             }
         }
     }

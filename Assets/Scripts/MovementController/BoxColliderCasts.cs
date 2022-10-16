@@ -21,11 +21,11 @@ namespace MovementController
         protected int VerticalRayCount { get; private set; }
         protected float HorizontalRaySpacing { get; private set; }
         protected float VerticalRaySpacing { get; private set; }
-        protected float BoundsWidth { get; private set; }
-        protected float BoundsHeight { get; private set; }
+        public float BoundsWidth { get; private set; }
+        public float BoundsHeight { get; private set; }
 
-        protected BoxCastOrigins BoxCastOrigins => _boxCastOrigins;
-        protected RaycastOrigins RaycastOrigins => _raycastOrigins; 
+        public BoxCastOrigins BoxCastOrigins => _boxCastOrigins;
+        public RaycastOrigins RaycastOrigins => _raycastOrigins; 
         
         public virtual void Awake()
         {
