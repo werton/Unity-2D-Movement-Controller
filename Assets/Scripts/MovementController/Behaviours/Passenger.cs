@@ -35,9 +35,9 @@ namespace MovementController
             }
         }
 
-        private void MoveTarget(Vector2 displacement)
+        private void MoveTarget(Vector2 offset)
         {
-            _movement.Move(displacement, DpadDirection.None);
+            _movement.Move(offset, DpadDirection.None);
         }
     }
 }

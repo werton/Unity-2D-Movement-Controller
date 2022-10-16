@@ -144,17 +144,17 @@ namespace MovementController
         ///     Check vertical collisions using ray cast - not using box cast here as it starts to interfere with horizontal box
         ///     cast / slopes
         /// </summary>
-        private void TryMoveVertically(ref Vector2 displacement)
+        private void TryMoveVertically(ref Vector2 offset)
         {
-            int directionY = Math.Sign(displacement.y);
-            float rayLength = Math.Abs(displacement.y) + SkinWidth;
+            int directionY = Math.Sign(offset.y);
+            float rayLength = Math.Abs(offset.y) + SkinWidth;
 
             for (var i = 0; i < VerticalRayCount; i++)
             {
                 // Send out rays to check for collisions for given layer in y dir, starting based on whether travelling up/down
                 Vector2 rayOrigin = directionY == -1 ? RaycastOrigins.bottomLeft : RaycastOrigins.topLeft;
                 // Note additional distance from movement in x dir needed to adjust rayOrigin correctly
-                rayOrigin += Vector2.right * (VerticalRaySpacing * i + displacement.x);
+                rayOrigin += Vector2.right * (VerticalRaySpacing * i + offset.x);
                 var hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, VerticalCollisionMask);
 
                 if (hit)
@@ -180,14 +180,14 @@ namespace MovementController
                     }
 
                     // Move object to just before the hit ray
-                    displacement.y = (hit.distance - SkinWidth) * directionY;
+                    offset.y = (hit.distance - SkinWidth) * directionY;
                     // Adjust ray length to make sure future rays don't lead to further movement past current hit
                     rayLength = hit.distance;
 
                     // Adjust x accordingly using tan(angle) = O/A, to prevent further ascend when ceiling hit
                     if (_ascendSlope)
-                        displacement.x = displacement.y / Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *
-                                         Math.Sign(displacement.x);
+                        offset.x = offset.y / Mathf.Tan(_collisionInfo.slopeAngle * Mathf.Deg2Rad) *
+                                         Math.Sign(offset.x);
 
                     _collisionDirection.below = directionY == -1;
                     _collisionDirection.above = directionY == 1;
@@ -208,19 +208,19 @@ namespace MovementController
         /// <summary>
         ///     Use of trig to work out X/Y components of displacement up slope
         /// </summary>
-        private void CheckSlopeAscent(ref Vector2 displacement, float slopeAngle)
+        private void CheckSlopeAscent(ref Vector2 offset, float slopeAngle)
         {
             // Use intended x dir speed for moveDistance (H) up slope 
-            var moveDistance = Math.Abs(displacement.x);
+            var moveDistance = Math.Abs(offset.x);
             // Work out ascendDisplacementY (O) with Sin(angle)=O/H
-            var ascendDisplacementY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+            var ascendOffsetY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
 
             // Check if object is jumping already before ascend
-            if (displacement.y <= ascendDisplacementY)
+            if (offset.y <= ascendOffsetY)
             {
-                displacement.y = ascendDisplacementY;
+                offset.y = ascendOffsetY;
                 // Work out ascendDisplacementX (A) with Cos(angle)=A/H
-                displacement.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(displacement.x);
+                offset.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(offset.x);
                 _collisionDirection.below = true;
                 _ascendSlope = true;
             }
@@ -230,33 +230,33 @@ namespace MovementController
         ///     Use of trig to work out X/Y components of displacement down slope
         ///     Additional checks done for max slope descent
         /// </summary>
-        private void CheckSlopeDescent(ref Vector2 displacement)
+        private void CheckSlopeDescent(ref Vector2 offset)
         {
             // Check for max slope angle hits, XOR ensures only on side checked at a time
             var maxSlopeHitLeft = Physics2D.Raycast(RaycastOrigins.bottomLeft, Vector2.down,
-                Math.Abs(displacement.y) + SkinWidth, VerticalCollisionMask);
+                Math.Abs(offset.y) + SkinWidth, VerticalCollisionMask);
             var maxSlopeHitRight = Physics2D.Raycast(RaycastOrigins.bottomRight, Vector2.down,
-                Math.Abs(displacement.y) + SkinWidth, VerticalCollisionMask);
+                Math.Abs(offset.y) + SkinWidth, VerticalCollisionMask);
 
             if (maxSlopeHitLeft ^ maxSlopeHitRight)
             {
                 if (maxSlopeHitLeft)
-                    SlideDownMaxSlope(maxSlopeHitLeft, ref displacement);
+                    SlideDownMaxSlope(maxSlopeHitLeft, ref offset);
                 else
-                    SlideDownMaxSlope(maxSlopeHitRight, ref displacement);
+                    SlideDownMaxSlope(maxSlopeHitRight, ref offset);
             }
             // Fix jittering at the end of sliding from max slope
             else if (maxSlopeHitLeft && maxSlopeHitRight)
             {
                 if (maxSlopeHitLeft.distance < maxSlopeHitRight.distance)
-                    SlideDownMaxSlope(maxSlopeHitLeft, ref displacement);
+                    SlideDownMaxSlope(maxSlopeHitLeft, ref offset);
                 else
-                    SlideDownMaxSlope(maxSlopeHitRight, ref displacement);
+                    SlideDownMaxSlope(maxSlopeHitRight, ref offset);
             }
 
             if (!SlidingDownMaxSlope)
             {
-                var directionX = Math.Sign(displacement.x);
+                var directionX = Math.Sign(offset.x);
                 var rayOrigin = directionX == -1 ? RaycastOrigins.bottomRight : RaycastOrigins.bottomLeft;
                 // Cast ray downwards infinitely to check for slope
                 var hit = Physics2D.Raycast(rayOrigin, -Vector2.up, Mathf.Infinity, VerticalCollisionMask);
@@ -270,18 +270,18 @@ namespace MovementController
                     var moveInSlopeDirection = Math.Sign(hit.normal.x) == directionX;
                     // Calculate accordingly using tan(angle) = O/A, to prevent further falling when slope hit
                     var fallingToSlope = hit.distance - SkinWidth <=
-                                         Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(displacement.x);
+                                         Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(offset.x);
 
                     if (descendableSlope && moveInSlopeDirection && fallingToSlope)
                     {
                         // Use intended x dir speed for moveDistance (H) down slope 
-                        var moveDistance = Math.Abs(displacement.x);
+                        var moveDistance = Math.Abs(offset.x);
                         // Work out descendDisplacementY (O) with Sin(angle)=O/H
-                        var descendDisplacementY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+                        var descendOffsetY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
                         // Work out descendDisplacementX (A) with Cos(angle)=A/H
-                        displacement.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance *
-                                         Math.Sign(displacement.x);
-                        displacement.y -= descendDisplacementY;
+                        offset.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance *
+                                         Math.Sign(offset.x);
+                        offset.y -= descendOffsetY;
 
                         _descendSlope = true;
                         _collisionDirection.below = true;
@@ -293,14 +293,14 @@ namespace MovementController
         /// <summary>
         ///     Slides down a non-climbable i.e. max slope based on gravity component affecting y
         /// </summary>
-        private void SlideDownMaxSlope(RaycastHit2D hit, ref Vector2 displacement)
+        private void SlideDownMaxSlope(RaycastHit2D hit, ref Vector2 offset)
         {
             var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
             _collisionInfo.SetSlopeAngle(slopeAngle, hit.normal, WallAngle, WallTolerance);
             if (slopeAngle > _maxSlopeAngle && slopeAngle < WallAngle - WallTolerance)
             {
                 // Calculate accordingly using tan(angle) = O / A, to slide on slope, where x (A), where y (O)
-                displacement.x = Math.Sign(hit.normal.x) * (Math.Abs(displacement.y) - hit.distance) /
+                offset.x = Math.Sign(hit.normal.x) * (Math.Abs(offset.y) - hit.distance) /
                                  Mathf.Tan(slopeAngle * Mathf.Deg2Rad);
                 SlidingDownMaxSlope = true;
             }

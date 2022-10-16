@@ -32,19 +32,19 @@ namespace MovementController
         {
             if (_globalWaypoints.Length > 0)
             {
-                var displacement = CalculatePlatformMovement();
+                var offset = CalculatePlatformMovement();
 
                 if (_passengerMover)
                 {
-                    _passengerMover.CalculatePassengerMovement(displacement);
+                    _passengerMover.CalculatePassengerMovement(offset);
 
                     _passengerMover.MovePassengers(true);
-                    transform.Translate(displacement);
+                    transform.Translate(offset);
                     _passengerMover.MovePassengers(false);
                 }
                 else
                 {
-                    transform.Translate(displacement);
+                    transform.Translate(offset);
                 }
             }
         }
