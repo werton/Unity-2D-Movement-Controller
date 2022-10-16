@@ -10,7 +10,6 @@ namespace MovementController
     {
         private PlayerVelocity _playerVelocity;
         private InputControl _input;
-        public DpadDirection DpadDirection { get; private set; }
 
         private void Awake()
         {

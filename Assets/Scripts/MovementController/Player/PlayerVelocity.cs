@@ -45,7 +45,6 @@ namespace MovementController
         private Movement _movement;
         private Vector3 _velocity;
         private Vector3 _oldVelocity;
-        // private Vector2 _directionalInput;
         private DpadDirection _directionalInput;
         private float _gravity;
         private float _maxJumpVelocity;
