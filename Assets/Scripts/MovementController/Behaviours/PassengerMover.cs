@@ -7,6 +7,7 @@ namespace MovementController
     public class PassengerMover : BoxColliderCasts
     {
         [SerializeField] private LayerMask _passengerMask;
+        
         private readonly Dictionary<Transform, Passenger> _passengerDictionary = new();
         private List<PassengerInfo> _passengerInfo;
 
