@@ -147,7 +147,10 @@ namespace MovementController
                         _movement.VerticalCollisionMask);
 
                     if (!hit)
+                    {
+                        _wallContact = false;
                         return;
+                    }
                 }
                 
               
